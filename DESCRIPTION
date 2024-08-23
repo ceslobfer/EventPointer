@@ -1,0 +1,57 @@
+Package: EventPointer
+Type: Package
+Title: An effective identification of alternative splicing events using
+        junction arrays and RNA-Seq data
+Version: 3.10.0
+Authors@R: c(person("Juan Pablo","Romero",role=c("aut"),email = "jpromero@ceit.es"),
+  person("Juan A.", "Ferrer-Bonsoms",role=c("aut","cre"),email = "jafhernandez@tecnun.es"),
+  person("Pablo", "Sacristan",role=c("aut"),email = "a904719@alumni.unav.es"),
+  person("Ander", "Muniategui",role=c("aut")),
+  person("Fernando", "Carazo",role=c("aut")),
+  person("Ander", "Aramburu",role=c("aut")),
+  person("Angel", "Rubio",role=c("aut"),email = "arubio@tecnun.es")
+    )
+Description: EventPointer is an R package to identify alternative splicing events 
+		that involve either simple (case-control experiment) or complex experimental designs 
+		such as time course experiments and studies including paired-samples. The algorithm can
+		be used to analyze data from either junction arrays (Affymetrix Arrays) or sequencing data (RNA-Seq). 
+		The software returns a data.frame with the detected alternative splicing 
+		events: gene name, type of event (cassette, alternative 3',...,etc), genomic 
+		position, statistical significance and increment of the percent spliced in (Delta PSI) for all 
+		the events.
+		The algorithm can generate a series of files to visualize the detected alternative 
+		splicing events in IGV. This eases the interpretation of results and the design 
+		of primers for standard PCR validation.
+Depends: R (>= 3.5.0), SGSeq, Matrix, SummarizedExperiment
+Imports: GenomicFeatures, stringr, GenomeInfoDb, igraph, MASS, nnls,
+        limma, matrixStats, RBGL, prodlim, graph, methods, utils,
+        stats, doParallel, foreach, affxparser, GenomicRanges,
+        S4Vectors, IRanges, qvalue, cobs, rhdf5, BSgenome, Biostrings,
+        glmnet, abind, iterators, lpSolve, poibin, speedglm, tximport,
+        fgsea
+Suggests: knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics, dplyr,
+        kableExtra
+License: Artistic-2.0
+LazyData: true
+RoxygenNote: 7.1.2
+Encoding: UTF-8
+biocViews: AlternativeSplicing, DifferentialSplicing, mRNAMicroarray,
+        RNASeq, Transcription, Sequencing, TimeCourse, ImmunoOncology
+VignetteBuilder: knitr
+Url: https://github.com/jpromeror/EventPointer
+BugReports: https://github.com/jpromeror/EventPointer/issues
+git_url: https://git.bioconductor.org/packages/EventPointer
+git_branch: RELEASE_3_18
+git_last_commit: 3989887
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: yes
+Packaged: 2023-10-24 21:10:25 UTC; biocbuild
+Author: Juan Pablo Romero [aut],
+  Juan A. Ferrer-Bonsoms [aut, cre],
+  Pablo Sacristan [aut],
+  Ander Muniategui [aut],
+  Fernando Carazo [aut],
+  Ander Aramburu [aut],
+  Angel Rubio [aut]
+Maintainer: Juan A. Ferrer-Bonsoms <jafhernandez@tecnun.es>
