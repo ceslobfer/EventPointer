@@ -4,16 +4,17 @@
 \alias{EventsDetection_BAM}
 \title{Detect splicing events using EventPointer BAM workflow}
 \usage{
-EventsDetection_BAM(folderBAMs, fileTransc = NULL, 
+EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF = NULL, 
                           cores = 1, region=NULL, AnnEvents=T,
                           min_junction_count = 5, max_complexity = 100,
+                          lambda = NULL,nboot = 20,
                           PathSGResult = ".")
 }
 \arguments{
 
-\item{folderBAMs}{Path to the folder with the alignment .bam files. It can be the path to a folder that contains other folders with the bams.}
+\item{PathSamplesAbundance}{Path to the folder with the alignment .bam files. It can be the path to a folder that contains other folders with the bams.}
 
-\item{fileTransc}{GTF file used for .bam files alignment}
+\item{PathTranscriptomeGTF}{GTF file used for .bam files alignment}
 
 \item{AnnEvents} {Parameter indicating whether or not to perform the annotation process on the events to classify them as possible novo. (This process can take some time)}
 
@@ -22,6 +23,8 @@ EventsDetection_BAM(folderBAMs, fileTransc = NULL,
 \item{min_junction_count}{Minimum fragment count required for a splice junction to be included.}
 
 \item{max_complexity}{Maximum allowed complexity. If a locus exceeds this threshold, it is skipped, resulting in a warning. Complexity is defined as the maximum number of unique predicted splice junctions overlapping a given position. High complexity regions are often due to spurious read alignments and can slow down processing.}
+
+\item{nboot}{Number of resamples of the quantification of the samplesto perform bootstrap.}
 
 \item{cores}{Number of cores used for parallel processing}
 
@@ -37,10 +40,12 @@ List with the information of all events found in samples.
 \dontrun{
   # Run EventDetection function
    data(SG_RNASeq)
-   TxtPath<-tempdir()
-   AllEvents_RNASeq<-EventsDetection_BAM(folderBAMs, fileTransc = NULL, 
-                          cores = 1, region=NULL, AnnEvents=T,
-                          min_junction_count = 5, max_complexity = 100,
-                          PathSGResult = ".")
+   PathSamplesAbundance <- system.file("extdata/bams", package = "EventPointer")
+   PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
+   PathSGResult<-tempdir()
+   EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF, 
+                                      cores = 9, region=16, AnnEvents=T,
+                                      min_junction_count = 5, max_complexity = 50,
+                                      PathSGResult = PathSGResult)
 
 }

@@ -8,12 +8,12 @@ EventsDetection_BAM <- function(PathSamplesAbundance,
   
   cat("Getting BAM general information.../n")
   
-  Bam_Info <- EventPointer:::getBamInfo(PathSamplesAbundance, cores = cores)
+  Bam_Info <- EventPointer:::getBamInfo(PathSamplesAbundance,region = region, cores = cores)
   
   cat("Obtaining Reference Transcriptome...")
 
   
-  TxDb <- GenomicFeatures:::makeTxDbFromGFF(file = PathTranscriptomeGTF,
+  TxDb <- GenomicFeatures::makeTxDbFromGFF(file = PathTranscriptomeGTF,
                                             format = "gtf", dataSource = "External Transcriptome")
   
   TxF_Ref <- convertToTxFeatures(TxDb)
@@ -74,10 +74,10 @@ EventsDetection_BAM <- function(PathSamplesAbundance,
     EventsDetection_pred <- EventPointer:::AnnEventsFunc(EventsDetection_pred,EventsDetection_ann, cores)
     closeAllConnections()
   }
-  save(EventsDetection_pred, file=paste0(PathSGResult,"/EventsDetection_EPBAM.R"))
+  save(EventsDetection_pred, file=paste0(PathSGResult,"/EventsDetection_EPBAM.RData"))
   
   PSI_boots <- EventPointer:::getPSI_RNASeq_boot(EventsDetection_pred, lambda = lambda, cores, nboot)
-  save(PSI_boots, file=paste0(PathSGResult,"/PSI_boots.R"))
+  save(PSI_boots, file=paste0(PathSGResult,"/PSI_boots.RData"))
   
   totalEventTable <- data.frame()
   for (geneEvent in EventsDetection_pred){
@@ -134,7 +134,7 @@ AnnEventsFunc <- function(EventsDetection_pred, EventsDetection_ann, cores){
   return(EventsDetection_pred)
 }
 
-getBamInfo <- function(PathSamplesAbundance, cores = 1)
+getBamInfo <- function(PathSamplesAbundance, region, cores = 1)
 {
   sample_name <- dir(PathSamplesAbundance,pattern = "*.bam$")
   if(identical(sample_name,character(0))){

@@ -27,11 +27,11 @@
 #'
 #'    EventsTxt<-paste(system.file('extdata',package='EventPointer'),'/EventsFound_RNASeq.txt',sep='')
 #'    PathGTF<-tempdir()
-#'    EventPointer_RNASeq_IGV(Events,SG_RNASeq,EventsTxt,PathGTF)
+#'    EventPointerBAM_IGV(Events,SG_RNASeq,EventsTxt,PathGTF)
 #'    }
 #' @export
 
-EventPointer_RNASeq_IGV <- function(SG_RNASeq, EventsTxt, PathGTF) {
+EventPointerBAM_IGV <- function(SG_RNASeq, EventsTxt, PathGTF) {
   
   if (is.null(SG_RNASeq)) {
     stop("Missing splicing graphs information")
@@ -114,7 +114,7 @@ EventPointer_RNASeq_IGV <- function(SG_RNASeq, EventsTxt, PathGTF) {
 
   cat("\n")
 }
-# EventPointer_RNASeq_IGV <- function(Events, 
+# EventPointerBAM_IGV <- function(Events, 
 #     SG_RNASeq, EventsTxt, PathGTF) {
 #     if (is.null(Events)) {
 #         stop("Missing alternative splicing events")

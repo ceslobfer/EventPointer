@@ -204,7 +204,7 @@ Once the process is completed the GTF file is generated in the specified directo
    # IGV Visualization
    # EventsTxt<-paste(system.file("extdata",package="EventPointer"),"/EventsFound_RNASeq.txt",sep="")
    # PathGTF<-tempdir()
-   # EventPointer_RNASeq_IGV(Events,SG_RNASeq,EventsTxt,PathGTF)
+   # EventPointerBAM_IGV(Events,SG_RNASeq,EventsTxt,PathGTF)
 ```
 
 

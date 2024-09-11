@@ -2170,7 +2170,7 @@ GetIGVPaths <- function(EventInfo, SG_Edges) {
       Str <- as.vector(rep(Path1[ii, 
                                  "Strand"], 2))
       Gn <- as.vector(rep(Gene, 2))
-      Trs <- rep("A", 2)
+      Trs <- rep("path1", 2)
       Res <- data.frame(chromosome = Chr, 
                         start = St, end = Ed, width = Wd, 
                         strand = Str, gene = Gn, 
@@ -2188,7 +2188,7 @@ GetIGVPaths <- function(EventInfo, SG_Edges) {
       Res <- data.frame(chromosome = Chr, 
                         start = St, end = Ed, width = Wd, 
                         strand = Str, gene = Gene, 
-                        transcript = "A", stringsAsFactors = FALSE)
+                        transcript = "path1", stringsAsFactors = FALSE)
       PlotPath1 <- rbind(PlotPath1, 
                          Res)
     }
@@ -2211,7 +2211,7 @@ GetIGVPaths <- function(EventInfo, SG_Edges) {
       Str <- as.vector(rep(Path2[ii, 
                                  "Strand"], 2))
       Gn <- as.vector(rep(Gene, 2))
-      Trs <- rep("B", 2)
+      Trs <- rep("path2", 2)
       Res <- data.frame(chromosome = Chr, 
                         start = St, end = Ed, width = Wd, 
                         strand = Str, gene = Gn, 
@@ -2229,7 +2229,7 @@ GetIGVPaths <- function(EventInfo, SG_Edges) {
       Res <- data.frame(chromosome = Chr, 
                         start = St, end = Ed, width = Wd, 
                         strand = Str, gene = Gene, 
-                        transcript = "B", stringsAsFactors = FALSE)
+                        transcript = "path2", stringsAsFactors = FALSE)
       PlotPath2 <- rbind(PlotPath2, 
                          Res)
     }
@@ -3779,9 +3779,9 @@ WriteGTF <- function(PATH, Data, Probes,
     # browser()
     if (Probes[i, 6] == "Ref") {
       COL <- "#B0B0B0"
-    } else if (Probes[i, 6] == "Path1") {
+    } else if (Probes[i, 6] == "path1") {
       COL <- "#D00000"
-    } else if (Probes[i, 6] == "Path2") {
+    } else if (Probes[i, 6] == "path2") {
       COL <- "#00CC33"
     }
     PROBES <- paste(Probes[i, 2], "\t", 
@@ -3832,13 +3832,13 @@ WriteGTF <- function(PATH, Data, Probes,
       aaaaaa <- 3
     }
     # if (all(!is.na(match('A',PATHS[i])))){
-    if (length(!is.na(grep("A", PATHS[i]))) != 
+    if (length(!is.na(grep("path1", PATHS[i]))) != 
         0) {
       COL <- "#D00000"
       aaaaaa <- 2
     }
     # if (all(!is.na(match('B',PATHS[i])))){
-    if (length(!is.na(grep("B", PATHS[i]))) != 
+    if (length(!is.na(grep("path2", PATHS[i]))) != 
         0) {
       COL <- "#00CC33"
       aaaaaa <- 1
@@ -3936,13 +3936,13 @@ WriteGTF_RNASeq <- function(PATH, Data, Paths) {
       aaaaaa <- 3
     }
     # if (all(!is.na(match('A',PATHS[i])))){
-    if (length(!is.na(grep("A", PATHS[i]))) != 
+    if (length(!is.na(grep("path1", PATHS[i]))) != 
         0) {
       COL <- "#D00000"
       aaaaaa <- 2
     }
     # if (all(!is.na(match('B',PATHS[i])))){
-    if (length(!is.na(grep("B", PATHS[i]))) != 
+    if (length(!is.na(grep("path2", PATHS[i]))) != 
         0) {
       COL <- "#00CC33"
       aaaaaa <- 1

@@ -132,7 +132,7 @@ kable(Events[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 2: EventPo
    # IGV Visualization
    EventsTxt<-paste(system.file("extdata",package="EventPointer"),"/EventsFound_RNASeq.txt",sep="")
    PathGTF<-tempdir()
-   EventPointer_RNASeq_IGV(Events,SG_RNASeq,EventsTxt,PathGTF)
+   EventPointerBAM_IGV(Events,SG_RNASeq,EventsTxt,PathGTF)
 
 ## ----GTFfGTF, eval=TRUE, warning=FALSE, collapse=TRUE-------------------------
 

@@ -29,6 +29,14 @@ Contrast <- cbind(
   c(0,1,0),
   c(0,0,1))
 
-EventPointerStats(PSI_boots, Design, Contrast, cores=8, UseBootstrap=T,
+EventPointerStats_BAM(PSI_boots, Design, Contrast, cores=8, UseBootstrap=T,
                   Threshold = 0, ram = 0.1,
                   nbootstraps = 1000, pathResult = PathSGResult)
+
+SG_RNASeq <- load("D:/EventPointerBioconductor/PruebaPaquete/SgFC.RData")
+SgFC
+load("D:/EventPointerBioconductor/PruebaPaquete/PSI_boots.RData")
+EventsTxt <- read.csv("D:/EventPointerBioconductor/PruebaPaquete/TotalEventsFound.csv",row.names = 1)
+EventsTxt<-"D:/EventPointerBioconductor/PruebaPaquete/TotalEventsFound.csv"
+PathGTF <- "D:/EventPointerToolkit/vignettes/"
+EventPointerBAM_IGV(SG_RNASeq, EventsTxt, PathGTF)

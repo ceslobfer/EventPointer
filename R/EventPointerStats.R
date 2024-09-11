@@ -1,4 +1,4 @@
-EventPointerStats <- function(PSI_boots, Design, Contrast, cores=1, UseBootstrap=T,
+EventPointerStats_BAM <- function(PSI_boots, Design, Contrast, cores=1,
                               Threshold = 0, ram = 0.1,
                               nbootstraps = 1000, pathResult = "./"){
 
@@ -25,18 +25,18 @@ EventPointerStats <- function(PSI_boots, Design, Contrast, cores=1, UseBootstrap
     #     write.csv(tableRes,file = paste0(pathResultVoom,"ResVoomContrast",idContrast,".csv"))
     #   }
     # }
-    if(UseBootstrap){
-      resBootstrap <- EventPointer_Bootstraps(PSI_boots, Design, Contrast, cores, ram, nbootstraps,
-                                              UseBootstrap, Threshold)
-      pathResultBootstrap <- paste0(pathResult, "bootstrapResult/")
-      dir.create(pathResultBootstrap)
-      for (coef in c(1:dim(resBootstrap$Pvalues)[2])){
-        tableRes <- EventPointer:::ResulTable(resBootstrap, coef = coef)
-        write.csv(tableRes,file = paste0(pathResultBootstrap,"ResBootstrapContrast",coef,".csv"))
-      }
+    # if(UseBootstrap){
+    resBootstrap <- EventPointer_Bootstraps(PSI_boots, Design, Contrast, cores, ram, nbootstraps,
+                                            UseBootstrap, Threshold)
+    pathResultBootstrap <- paste0(pathResult, "bootstrapResult/")
+    dir.create(pathResultBootstrap)
+    for (coef in c(1:dim(resBootstrap$Pvalues)[2])){
+      tableRes <- EventPointer:::ResulTable(resBootstrap, coef = coef)
+      write.csv(tableRes,file = paste0(pathResultBootstrap,"ResBootstrapContrast",coef,".csv"))
+    }
       
 
-    }
+    # }
 
   }
   
