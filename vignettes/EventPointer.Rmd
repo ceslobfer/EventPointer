@@ -79,6 +79,16 @@ involves the statistical analysis related to the calculation of the PSI
 increment between conditions. ![Figure 3. Output of
 CDFfromGTF](Fig1_vignnete_EP.png)
 
+Ambas aproximaciones poseen un elemento común dentro de sus respectivos
+flujos de trabajo, y es la creación de un splicing graph.
+EventPointerBAM realiza la creación del splicing graph a partir de las
+lecturas alineadas usando alineadosres sensibles a las llamadas
+junctions reads (Ej. STAR), mientras que EventPointerST utiliza las
+anotaciones existentes de exones de las isofórmas de cada gen para crear
+el splicing graph, por ello solo requiere las abundancias relativas a
+estas isoformas para su flujo de trabajo. ![Figure 4. Splicing
+graph](SplicingGraph.png)
+
 For more details on the differences and procedures involved in each
 approach, please refer to our paper: \* Romero, Juan P., et al.
 "Comparison of RNA-seq and microarray platforms for splice event
@@ -101,7 +111,7 @@ This function is responsible for the detection of events from the input
 alignment files, their classification and the calculation of the
 associated PSI. The required input for the function is described below:
 
--    **PathSamplesAbundance** : Path to bam files or path to folder with
+-   **PathSamplesAbundance** : Path to bam files or path to folder with
     bam files.
 
 -   **PathTranscriptomeGTF**: Path to the trascriptome annotation in GTF
@@ -131,7 +141,7 @@ associated PSI. The required input for the function is described below:
 -   **AnnEvetns**: Boolean parameter indicating whether or not to
     perform the annotation process on the events to classify them as
     possible novo. (This process can take some time)
--   **PathSGResult**: Folder where save the function result. PSI and
+-   **PathSGResult**: Folder where save the function result.  $\Psi$ and
     splicing graph objects in RData format.
 
 Using EventsDetection_BAM function:
@@ -155,10 +165,9 @@ EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF,
 
 ## EventPointerStats_BAM()
 
-Esta función realiza la comparativa diferencial entre los grupos de
-muestras para el calculo del delta PSI.
+This function performs the differential comparison between sample groups for the calculation of delta PSI.
 
-### *Statistical parameters*:
+### *Parameters*:
 
 -   **Design**: A matrix defining the linear model. Each row corresponds
     to an array, and each column corresponds to a coefficient (such as
@@ -167,7 +176,7 @@ muestras para el calculo del delta PSI.
     correspond to coefficients in the design matrix, and columns
     correspond to contrasts.
 -   **Threshold**: it assigns a threshold to compute the pvalues.
-    default = 0
+    Default = 0
 -   **UseBootstrap**: Boolean variable to indicate if bootstrap step in
     $\Psi$ is applicated.
 -   **nbootstraps**: How many layers, Bootstraps or samplings are going
@@ -178,6 +187,7 @@ muestras para el calculo del delta PSI.
 ### *Command example*:
 
 ```{r, eval=FALSE, warning=FALSE, collapse=TRUE}
+data(PSI_boots)
 #Creation of design matrix
 Design <- cbind(rep(1,9),
                  rep(c(1,0,0),3),
@@ -186,7 +196,6 @@ Design <- cbind(rep(1,9),
 Contrast <- cbind(
   c(0,1,0),
   c(0,0,1))
-load("D:/EventPointerBioconductor/PruebaPaquete/PSI_boots.RData")
 
 EventPointerStats_BAM(PSI_boots, Design, Contrast, cores=8, UseBootstrap=F,
                   Threshold = 0, nbootstraps = 1000, pathResult = PathSGResult)
@@ -209,8 +218,8 @@ kable(tableContrast1[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 1:
 Obtendremos una tabla como la mostrada por cada contraste indicado en
 nuestra matriz de contraste. El sistema de archivos resultante tanto de
 la funcion `EventPointerStats_BAM()` y `EventsDetection_BAM()` será el
-siguiente: ![Figure 2. Output EventPointerBAM
-functions](ImagenFicherosResultados.drawio.png)
+siguiente: 
+![Figure 2. Output EventPointerBAM functions](ImagenFicherosResultados.drawio.png)
 
 ## IGV visualization
 
@@ -267,41 +276,80 @@ identificación provocando falsos positivos.
 
 ## EventsDetection_ST()
 
-This function is responsible for the detection of events from the input
-alignment files, their classification and the calculation of the
-associated PSI. The required input for the function is described
-below: - **PathSamplesAbundance** : Path to bam files or path to folder
-with bam files. - **PathTranscriptomeGTF**: Path to the trascriptome
-annotation in GTF format.
+The `EventsDetection_ST()` function represents the initial step in the
+EventPointerST workflow. Similar to EventPointerBAM, this function is
+responsible for creating the splicing graph, identifying events, and
+obtaining the  $\Psi$ from abundance data. In this case, by basing the
+identification of events on the annotation, we can provide data from
+previously detected events to avoid the steps of splicing graph
+generation and event identification for an annotation that has already
+been used.
 
-### *Detection parameters*:
+```{r, eval=F}
+PathFiles<-system.file("extdata",package="EventPointer")
+PathTranscriptomeGTF <- paste(PathFiles,"/gencode.v24.ann_2genes.gtf",sep="")
+PathSamplesAbundance <- paste0(PathFiles,"/output")
+PathSamplesAbundance <- dir(PathSamplesAbundance,full.names = TRUE)
+Pathtxt <- tempdir()
+EventsPSI <- EventsDetection_ST(PathSamplesAbundance,PathTranscriptomeGTF = PathTranscriptomeGTF,
+                                PathEventsGTFResults=Pathtxt,
+                                cores=1, typeAbundance = "kallisto", Bootstrap=T, Filter=F,
+                                Qn = 0.25)
+```
 
--   **min_junction_count** : Minimum fragment count required for a
-    splice junction to be included in the splicing gaph.
--   **max_complexity**: Maximum allowed complexity. If a locus exceeds
-    this threshold, it is skipped, resulting in a warning. Complexity is
-    defined as the maximum number of unique predicted splice junctions
-    overlapping a given position. High complexity regions are often due
-    to spurious read alignments and can slow down processing.
--   **region**: Numerical vector indicating the regions (at the
-    chromosomal level) to be used for event searching.
+### *Parameters*:
 
-### *PSI calculation parameters*:
+-   **PathSamplesAbundance**: Path to quantification data of gene
+    isoforms obtained from the corresponding pseudoaligner.
+-   **PathTranscriptomeGTF**: Path to gene annotation GTF file.
+-   **EventsTranscriptome**: Events detected from a previos
+    identification from a GTF.
+-   **PathEventsGTFResults:** Path where the detected event data from a
+    GTF file and the  $\Psi$ results will be generated.
+-   **Bootstrap:** Boolean indicating whether to perform the PSI
+    bootstrap.
+-   **typeAbundance:** Type of abundance files provided for the PSI analysis. The options are "salmon" or "kallisto".
+-   **Filter:** Boolean variable to indicate if an expression filter is applied. Default FALSE.
+-   **Qn:** Quantile used to filter the events (Bounded between 0-1, Q1
+    would be 0.25).
 
--   **nboot**: Number of resamples of the quantification of the samples
-    to perform bootstrap.
--   **lambda**:
+##EventPointerStats_ST()
 
-### *Performance & results parameters*:
+This function performs the differential comparison between sample groups for the calculation of delta PSI.
 
--   **cores**: Nº of cores used for the function.
--   **AnnEvetns**: Boolean parameter indicating whether or not to
-    perform the annotation process on the events to classify them as
-    possible novo. (This process can take some time)
--   **PathSGResult**: Folder where save the function result. PSI and
-    splicing graph objects in RData format.
+### *Parameters*:
 
-Using EventsDetection_BAM function:
+-   **PSI**: RData variable resulting  from EventsDetection_ST()
+-   **Design**: A matrix defining the linear model. Each row corresponds
+    to an array, and each column corresponds to a coefficient (such as
+    the baseline and treatment effects).
+-   **Contrast**: A numeric matrix with contrasts to be tested. Rows
+    correspond to coefficients in the design matrix, and columns
+    correspond to contrasts.
+-   **BootstrapStats**: Boolean variable to indicate if bootstrap step in PSI is applicated.
+-   **PSI**: RData variable resulting  from EventsDetection_ST()
+-   **UsePseudoAligBootstrap**: TRUE (default) if bootstrap data from pseudoaligment want to be used or FALSE if not.
+-   **nbootstraps**: How many layers, Bootstraps or samplings are going
+    to be used. Caution, high numbers increase computational time.
+-   **cores**: The number of cores desired to use.
+-   **pathResult**: Folder where save the function result.
+
+### *Command example*:
+
+```{r, eval=FALSE, warning=FALSE, collapse=TRUE}
+data(PSI_boots)
+#Creation of design matrix
+Design <- cbind(1,rep(c(0,1),each=2))
+#Creation of contrast matrix
+Contrast <- matrix(c(0,1),nrow=2)
+
+pathResult <- tempdir()
+EventPointerStats_ST(PSI, Design, Contrast, cores=1, 
+                                 BootstrapStats = T,nbootstraps= 10000, 
+                                 UsePseudoAligBootstrap = T,Threshold = 0,
+                                 pathResult=pathResult)
+
+```
 
 # RNA-Seq analysis
 
@@ -577,7 +625,7 @@ names(EventXtrans)
 Given (I) the output of *EventDetection_transcriptome*, which contains
 events information and (II) the result of pseudo-alignment, EventPointer
 is able to get the expression of the path of each event and also to
-compute the PSI value.
+compute the $\Psi$ value.
 
 To first step is to load the data from pseudo-alignment. EventPointer
 works with both *Kallisto* and *Salmon* methods.
@@ -634,7 +682,7 @@ colnames(RNASeq) <- filesnames
 ```
 
 Once we have the expression of the isoforms loaded, the next step is to
-compute the PSI value. For both cases (with or withuot bootstrap data
+compute the $\Psi$ value. For both cases (with or withuot bootstrap data
 from psudoaligment) EventPointer provides the function
 *GetPSI_FromTranRef* for this purpose.
 
@@ -771,11 +819,11 @@ kable(Fit,digits=5,row.names=FALSE,align="c",caption = "Table 3: PSI_Statistic r
 
 We have implemented a bootstrap test to evaluate the difference in
 $\Psi$ among the conditions under study. This test can be done both for
-PSI values that contain information from the pseudo-alignment bootstrap
+$\Psi$ values that contain information from the pseudo-alignment bootstrap
 and for cases in which we do not have this information.
 
 The function *EventPointer_Bootstraps* proceed to calculate the increase
-in PSI and its p.values by performing bootstrap statistic test. This
+in $\Psi$ and its p.values by performing bootstrap statistic test. This
 function can be parallelized. Users may set the number of Cores (by
 default 1) and the ram available (by default 1 Gb).
 
@@ -1377,12 +1425,12 @@ complex.
 ## Percent Spliced In
 
 EventPointer estimates the abundance of the isoforms mapped to each of
-the paths, in an splicing event, to obtain the PSI values. With this
+the paths, in an splicing event, to obtain the $\Psi$ values. With this
 values, a simple linear model, using the provided design and contrast
 matrices, is solved and this increment is returned to the user in the
-data.frame (if PSI argument is TRUE).
+data.frame (if $\Psi$ argument is TRUE).
 
-It is possible to obtain the estimated PSI values using the internal
+It is possible to obtain the estimated $\Psi$ values using the internal
 functions *getPSI*,*getPSImultipath* for junction arrays,
 *getPSI_RNASeq* or *getPSI_RNASeq_MultiPath* for RNA-Seq data (data from
 the pipeline described in section *4.2: statistical analysis from de BAM

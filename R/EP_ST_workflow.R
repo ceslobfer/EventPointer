@@ -29,7 +29,7 @@ EventsDetection_ST<- function(PathSamplesAbundance=NULL,
   }else{
     stop("Events not provided")
   }
-  
+  save(PSI,file=paste0(PathEventsGTFResults,"/PSI_ST.RData"))
   return(PSI)
   
   
