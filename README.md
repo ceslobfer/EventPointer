@@ -5,19 +5,9 @@
 [![updated](http://bioconductor.org/shields/lastcommit/release/bioc/EventPointer.svg)](http://bioconductor.org/packages/release/bioc/html/EventPointer.html)
 [![yearsBioC](http://bioconductor.org/shields/years-in-bioc/EventPointer.svg)](http://bioconductor.org/packages/release/bioc/html/EventPointer.html)
 
-*EventPointer* is an R package to identify alternative splicing events 
-		that involve either simple (case-control experiment) or complex experimental designs 
-		such as time course experiments and studies including paired-samples. The algorithm can
-		be used to analyze data from either junction arrays (Affymetrix Arrays) or sequencing data (RNA-Seq). 
-		The software returns a data.frame with the detected alternative splicing 
-		events: gene name, type of event (cassette, alternative 3',...,etc), genomic 
-		position, statistical significance and increment of the percent spliced in (Delta PSI) for all 
-		the events.
-		The algorithm can generate a series of files to visualize the detected alternative 
-		splicing events in IGV. This eases the interpretation of results and the design 
-		of primers for standard PCR validation.
+The *EventPointerToolkit* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
 
-![**Figure 1.** EventPointer pipeline ](https://github.com/jpromeror/EventPointer/blob/master/vignettes/Figure1.png)
+![**Figure 1.** EventPointer pipeline ](https://github.com/jpromeror/EventPointer/blob/master/vignettes/generalWorkflowEP_image.png)
 
 # Installation
 EventPointer can be installed from Bioconductor using the BiocManager package:
