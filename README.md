@@ -7,7 +7,7 @@
 
 The *EventPointerToolkit* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
 
-![**Figure 1.** EventPointer pipeline ](https://github.com/jpromeror/EventPointer/blob/master/vignettes/generalWorkflowEP_image.png)
+![**Figure 1.** EventPointer pipeline ](https://github.com/ceslobfer/EventPointerToolkit/tree/main/vignettes/generalWorkflowEP_image.png)
 
 # Installation
 EventPointer can be installed from Bioconductor using the BiocManager package:
