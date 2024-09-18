@@ -1,13 +1,13 @@
 ---
-title: "EventPointer: An effective identification of alternative splicing events using junction arrays and RNA-Seq data"
+title: "EventPointerToolkit: An effective identification of alternative splicing events using RNA-Seq data"
 author: "Cesar Lobato-Fernandez, Juan A. Ferrer-Bonsoms & Angel Rubio"
 date: "`r BiocStyle::doc_date()`"
 abstract: >
   The *EventPointerToolkit* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
 vignette: >
   %\VignetteEncoding{UTF-8}
-  %\VignetteIndexEntry{EventPointer}
-  %\VignettePackage{EventPointer}
+  %\VignetteIndexEntry{EventPointerToolkit}
+  %\VignettePackage{EventPointerToolkit}
   %\VignetteEngine{knitr::rmarkdown}
 output:
   BiocStyle::html_document:
@@ -21,7 +21,7 @@ editor_options:
 ```{r LoadFunctions, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 library(knitr)
 opts_chunk$set(error = FALSE)
-library(EventPointer)
+library(EventPointerToolkit)
 library(dplyr)
 library(kableExtra)
 ```
@@ -42,7 +42,7 @@ library(BiocManager)
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
-BiocManager::install("EventPointer")
+BiocManager::install("EventPointerToolkit")
 ```
 
 # Introduction
@@ -53,7 +53,7 @@ RNA-seq data. There are two types of workflows to follow using
 EventPointer, both aiming for the same objective but employing different
 approaches to achieve it:
 
--   *EventPointer_BAM (EP_BAM)* The initial files for this workflow are
+-   *EventPointerBAM (EP_BAM)* The initial files for this workflow are
     the BAM files resulting from the alignment of RNA-seq sequences. The
     alignment should be performed using a splice-aware aligner
     (recommended example: STAR). From these files, the detection,
@@ -61,7 +61,7 @@ approaches to achieve it:
     out. The main advantage of this methodology is its ability to detect
     de novo events based on the alignment of reads.
 
--   *EventPointer_ST (EP_ST)* In this case, the detection and
+-   *EventPointerST (EP_ST)* In this case, the detection and
     classification of events are determined by the corresponding
     transcriptome annotation in GTF format. The quantification files of
     transcripts come from pseudoaligners (examples: salmon and
@@ -73,21 +73,14 @@ and EP_ST) into two steps. One part involves the detection, cataloging,
 and calculation of the Percent Spliced In (PSI) of events, and the other
 involves the statistical analysis related to the calculation of the PSI
 increment between conditions. 
-![Figure 1. General worflow EventPointerToolkit](Fig1_vignnete_EP.png)
+![**Figure 1.** General worflow EventPointerToolkit](Fig1_vignnete_EP.png)
 
 Both approaches share a common element within their respective workflows: the creation of a splicing graph. EventPointerBAM creates the splicing graph from aligned reads using aligners sensitive to junction reads (e.g., STAR). In contrast, EventPointerST utilizes the existing annotations of exons from each gene's isoforms to create the splicing graph, thus requiring only the relative abundances of these isoforms for its workflow.
-![Figure 4. Splicing graph](SplicingGraph.png)
+![**Figure 2.** Splicing graph](SplicingGraph.png)
 
-For more details on the differences and procedures involved in each
-approach, please refer to our paper: \* Romero, Juan P., et al.
-"Comparison of RNA-seq and microarray platforms for splice event
-detection using a cross-platform algorithm." BMC genomics 19.1 (2018):
-703.
-[doi:10.1186/s12864-018-5082-2](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-5082-2)
+# EventPointerBAM
 
-# EventPointer_BAM
-
-The aim of EventPointer_BAM is to perform detection, classification,
+The aim of EventPointerBAM is to perform detection, classification,
 quantification and differential analysis between conditions using as
 input data sequence alignments of RNA-seq data performed using aligners
 sensitive to junction reads. *Advantages: De novo event detection.*
@@ -138,13 +131,10 @@ Using EventsDetection_BAM function:
 ```{r, eval=FALSE, warning=FALSE, collapse=TRUE}
 
 PathSamplesAbundance <- system.file("extdata/bams", package = "EventPointer")
-# PathSamplesAbundance <- "D:/EventPointerBioconductor/EventPointer/inst/extdata/bams"
 
 PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
-# PathTranscriptomeGTF <- "D:/EventPointer_3.0_replicate/simulation_data/annotation/refseq_hg19.formatted.gtf"
-# TxDb <- GenomicFeatures:::makeTxDbFromGFF(file = PathTranscriptomeGTF,
-#                                           format = "gtf", dataSource = "External Transcriptome")
-PathSGResult <- "D:/EventPointerBioconductor/PruebaPaquete/"
+
+PathSGResult <- tempdir()
 EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF, 
                                       cores = 9, region=16, AnnEvents=T,
                                       min_junction_count = 5, max_complexity = 50,
@@ -196,15 +186,15 @@ EventPointerStats_BAM(PSI_boots, Design, Contrast, cores=8, UseBootstrap=F,
 The following table shows an example of the results associated with the differential $\Psi$ analysis of the indicated comparisons performed by the EventPointerStats_BAM() function. It presents the $\Delta \Psi$ associated with each event of that contrast and its corresponding significance parameters.
 
 ```{r EP_BAM_RES_TABLE, echo=FALSE}
-tableContrast1 <- read.csv("./EventPointerStatsResult/bootstrapResult/ResBootstrapContrast1.csv",row.names = 1)
-kable(tableContrast1[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 1: EventPointer_BAM results")
+tableContrast1 <- read.csv(paste0(PathSGResult,"/EventPointerStatsResult/bootstrapResult/ResBootstrapContrast1.csv"),row.names = 1)
+kable(tableContrast1[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 1: EventPointerBAM results")
 ```
 
 Obtendremos una tabla como la mostrada por cada contraste indicado en
 nuestra matriz de contraste. El sistema de archivos resultante tanto de
 la funcion `EventPointerStats_BAM()` y `EventsDetection_BAM()` será el
 siguiente: 
-![Figure 2. Output EventPointerBAM functions](ImagenFicherosResultados.drawio.png)
+![**Figure 3.** Output EventPointerBAM functions](ImagenFicherosResultados.drawio.png)
 
 ## IGV visualization
 
@@ -320,16 +310,15 @@ EventPointerStats_ST(PSI, Design, Contrast, cores=1,
 
 ```
 
-El formato de salida de la tabla de eventos resultante de la funcion EventPointerStats_ST() es similar a la de su función homóloga de EventPointerBAM. El aspecto de la carpeta que contiene el resultado del flujo de trabajo completo es el siguiente: 
-![Figure 5. Output EventPointerBAM functions](archivosEPST.drawio.png)
+The output format of the event table resulting from the EventPointerStats_ST() function is similar to that of its counterpart in EventPointerBAM. The structure of the folder containing the complete workflow results is as follows:
+![**Figure 5.** Output EventPointerST functions](archivosEPST.drawio.png)
 
 
 
 # References
 
--   Romero, Juan P., et al. "EventPointer: an effective identification
-    of alternative splicing events using junction arrays." BMC genomics
-    17.1 (2016): 467.
+-   Ferrer-Bonsoms, Juan A., et al. "EventPointer 3.0: flexible and accurate splicing analysis that includes studying the differential usage of protein-domains" NAR Genomics and Bioinformatics
+    4,3 (2022).
 -   Romero, Juan P., et al. "Comparison of RNA-seq and microarray
     platforms for splice event detection using a cross-platform
     algorithm." BMC genomics 19.1 (2018): 703.

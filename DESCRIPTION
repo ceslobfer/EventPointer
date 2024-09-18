@@ -1,4 +1,4 @@
-Package: EventPointer
+Package: EventPointerToolkit
 Type: Package
 Title: An effective identification of alternative splicing events using
         junction arrays and RNA-Seq data
@@ -11,17 +11,7 @@ Authors@R: c(person("Juan Pablo","Romero",role=c("aut"),email = "jpromero@ceit.e
   person("Ander", "Aramburu",role=c("aut")),
   person("Angel", "Rubio",role=c("aut"),email = "arubio@tecnun.es")
     )
-Description: EventPointer is an R package to identify alternative splicing events 
-		that involve either simple (case-control experiment) or complex experimental designs 
-		such as time course experiments and studies including paired-samples. The algorithm can
-		be used to analyze data from either junction arrays (Affymetrix Arrays) or sequencing data (RNA-Seq). 
-		The software returns a data.frame with the detected alternative splicing 
-		events: gene name, type of event (cassette, alternative 3',...,etc), genomic 
-		position, statistical significance and increment of the percent spliced in (Delta PSI) for all 
-		the events.
-		The algorithm can generate a series of files to visualize the detected alternative 
-		splicing events in IGV. This eases the interpretation of results and the design 
-		of primers for standard PCR validation.
+Description: EventPointerToolkit R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
 Depends: R (>= 3.5.0), SGSeq, Matrix, SummarizedExperiment
 Imports: GenomicFeatures, stringr, GenomeInfoDb, igraph, MASS, nnls,
         limma, matrixStats, RBGL, prodlim, graph, methods, utils,
@@ -38,20 +28,20 @@ Encoding: UTF-8
 biocViews: AlternativeSplicing, DifferentialSplicing, mRNAMicroarray,
         RNASeq, Transcription, Sequencing, TimeCourse, ImmunoOncology
 VignetteBuilder: knitr
-Url: https://github.com/jpromeror/EventPointer
-BugReports: https://github.com/jpromeror/EventPointer/issues
-git_url: https://git.bioconductor.org/packages/EventPointer
+Url: https://github.com/ceslobfer/EventPointerToolkit
+BugReports: https://github.com/ceslobfer/EventPointerToolkit/issues
+git_url: https://git.bioconductor.org/packages/EventPointerToolkit
 git_branch: RELEASE_3_18
 git_last_commit: 3989887
 git_last_commit_date: 2023-10-24
 Date/Publication: 2023-10-24
 NeedsCompilation: yes
 Packaged: 2023-10-24 21:10:25 UTC; biocbuild
-Author: Juan Pablo Romero [aut],
+Author: Cesar Lobato-Fernandez [aut],
   Juan A. Ferrer-Bonsoms [aut, cre],
   Pablo Sacristan [aut],
   Ander Muniategui [aut],
   Fernando Carazo [aut],
   Ander Aramburu [aut],
   Angel Rubio [aut]
-Maintainer: Juan A. Ferrer-Bonsoms <jafhernandez@tecnun.es>
+Maintainer: Cesar Lobato-Fernandez <clobatofern@unav.es>

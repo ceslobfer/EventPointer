@@ -39,7 +39,6 @@ List with the information of all events found in samples.
 \examples{
 \dontrun{
   # Run EventDetection function
-   data(SG_RNASeq)
    PathSamplesAbundance <- system.file("extdata/bams", package = "EventPointer")
    PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
    PathSGResult<-tempdir()

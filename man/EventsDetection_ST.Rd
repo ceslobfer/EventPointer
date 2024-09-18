@@ -14,7 +14,7 @@ EventsDetection_ST(PathSamplesAbundance = NULL, PathTranscriptomeGTF = NULL, Eve
 
 \item{PathTranscriptomeGTF}{Path to the GTF file of the reference transcriptome.}
 
-\item{EventsTranscriptome} {If the user wishes to provide events detected from a previous work, the path to the RData file can be provided.}
+\item{EventsTranscriptome}{If the user wishes to provide events detected from a previous work, the path to the RData file can be provided.}
 
 \item{PathEventsGTFResults}{Path to locate the results of the function.}
 
