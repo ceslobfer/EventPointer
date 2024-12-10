@@ -38,7 +38,7 @@ EventsDetection_ST<- function(PathSamplesAbundance=NULL,
 EventPointerStats_ST <- function(PSI, Design, Contrast, cores=1, ram=4, 
                                  BootstrapStats = T,nbootstraps= 10000, 
                                  UsePseudoAligBootstrap = T,Threshold = 0,
-                                 VoomStats = T, pathResult="./"){
+                                 VoomStats = F, pathResult="./"){
   
   if(is.null(Design)){
     stop("Design field is empty")
@@ -47,7 +47,7 @@ EventPointerStats_ST <- function(PSI, Design, Contrast, cores=1, ram=4,
     stop("Contrast field is empty")
   }
   pathResult <- paste0(pathResult, "/EventPointerStatsSTResult/")
-  checkMatrices <- EventPointer:::checkContrastDesignMatrices(Contrast, Design)
+  checkMatrices <- checkContrastDesignMatrices(Contrast, Design)
   if(checkMatrices){
     if (!file.exists(pathResult)) {
       dir.create(pathResult)
@@ -78,7 +78,7 @@ EventPointerStats_ST <- function(PSI, Design, Contrast, cores=1, ram=4,
       pathResultBootstrap <- paste0(pathResult, "bootstrapResult/")
       dir.create(pathResultBootstrap)
       for (coef in c(1:dim(resBootstrap$Pvalues)[2])){
-        tableRes <- EventPointer:::ResulTable(resBootstrap, coef = coef)
+        tableRes <- ResulTable(resBootstrap, coef = coef)
         write.csv(tableRes,file = paste0(pathResultBootstrap,"ResBootstrapContrast",coef,".csv"))
       }
     }

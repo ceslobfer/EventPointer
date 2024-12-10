@@ -1,14 +1,16 @@
 
 EventsDetection_BAM <- function(PathSamplesAbundance, 
                           PathTranscriptomeGTF = NULL, 
-                          cores = 1, region=NULL, AnnEvents=T,
-                          min_junction_count = 5, max_complexity = 100,
-                          lambda = NULL,nboot = 20,
+                          cores = 1, region=NULL,
+                          min_junction_count = 2, max_complexity = 30,
+                          lambda = NULL,nboot = 20,min_n_sample = NULL,
+                          min_anchor = 6,
                           PathSGResult = ".") {
+  
   
   cat("Getting BAM general information.../n")
   
-  Bam_Info <- EventPointer:::getBamInfo(PathSamplesAbundance,region = region, cores = cores)
+  Bam_Info <- getBamInfo(PathSamplesAbundance,region = region, cores = cores)
   
   cat("Obtaining Reference Transcriptome...")
 
@@ -39,53 +41,65 @@ EventsDetection_BAM <- function(PathSamplesAbundance,
     
   }
   
+  if(is.null(min_n_sample)){
+    min_n_sample<-min(c(length(Bam_Info$file_bam),3))
+  }
+  
   seqlevelsStyle(TxF_Ref) <- seqlevelsStyle(which)
   
   TxF_RefLevels <- TxF_Ref[which(as.vector(seqnames(TxF_Ref)) %in% as.vector(seqnames(which)))]
 
   cat("\n Creating the splicing graph from the alignment files. This will take some time...")
   if (!is.null(which)) {
-    TxF_mod <- EventPointer:::predictTxFeatures(Bam_Info, cores = cores, which = which, min_junction_count = min_junction_count, max_complexity = max_complexity)  
+    TxF_mod <- predictTxFeatures(Bam_Info, cores = cores, which = which, 
+                                 min_junction_count = min_junction_count,
+                                 min_n_sample = min_n_sample, 
+                                 max_complexity = max_complexity,
+                                 min_anchor = min_anchor)  
   }else{
-    TxF_mod <- EventPointer:::predictTxFeatures(Bam_Info, cores = cores, min_junction_count = min_junction_count, max_complexity = max_complexity)  
+    TxF_mod <- predictTxFeatures(Bam_Info, cores = cores, 
+                                 min_junction_count = min_junction_count,
+                                 min_n_sample = min_n_sample,
+                                 max_complexity = max_complexity,
+                                 min_anchor = min_anchor)  
   }
   # closeAllConnections()
   seqlevelsStyle(TxF_Ref) <- seqlevelsStyle(TxF_mod)
   
   features <- convertToSGFeatures(TxF_mod)
   features <- annotate(features, TxF_RefLevels)
-  
+  valid_rows <- which(lengths(features@geneName)>0)
+  features <- features[valid_rows]
   cat("\n Assigning read counts to the paths in the splicing graph...")
-  SgFC <- EventPointer:::getSGFeatureCounts(Bam_Info, 
+  SgFC <- getSGFeatureCounts(Bam_Info, min_anchor = min_anchor,
                                                 features, cores = cores)
   closeAllConnections()
   cat("\n Detect event from splicing graph...")
   SgFC <- annotate(SgFC, TxF_RefLevels)
-  EventsDetection_pred<-EventPointer:::EventDetection(SgFC,
-                                                        cores=cores)
+  
   save(SgFC,file=paste0(PathSGResult,"/SgFC.RData"))
+  EventsDetection_pred<-EventDetection(SgFC, cores=cores)
+  
   cat("\n Checking that detected events are previously annotated...")
-  if (AnnEvents) {
-    SGgtf <- convertToSGFeatures(TxF_RefLevels)
-    closeAllConnections()
-    EventsDetection_ann<-EventPointer:::EventDetectionAnn(SGgtf,
-                                                          cores=cores)
-    closeAllConnections()
-    EventsDetection_pred <- EventPointer:::AnnEventsFunc(EventsDetection_pred,EventsDetection_ann, cores)
-    closeAllConnections()
-  }
+
   save(EventsDetection_pred, file=paste0(PathSGResult,"/EventsDetection_EPBAM.RData"))
   
-  PSI_boots <- EventPointer:::getPSI_RNASeq_boot(EventsDetection_pred, lambda = lambda, cores, nboot)
+  PSI_boots <- getPSI_RNASeq_boot(EventsDetection_pred, lambda = lambda, cores, nboot)
   save(PSI_boots, file=paste0(PathSGResult,"/PSI_boots.RData"))
   
-  totalEventTable <- data.frame()
-  for (geneEvent in EventsDetection_pred){
-    for(event in geneEvent){
-      totalEventTable <-rbind(totalEventTable,event$Info)
+  event_list <- list()
+  index <- 1
+  
+  for (geneEvent in EventsDetection_pred) {
+    for (event in geneEvent) {
+      event_list[[index]] <- event$Info
+      index <- index + 1
     }
   }
-  write.csv(totalEventTable,file = paste0(PathSGResult,"/TotalEventsFound.csv"))
+  
+  totalEventTable <- do.call(rbind, event_list)
+  
+  write.csv(totalEventTable, file = paste0(PathSGResult, "/TotalEventsFound.csv"), row.names = FALSE)
   
   cat("\n DONE!")
   closeAllConnections()
@@ -157,7 +171,7 @@ getBamInfo <- function(PathSamplesAbundance, region, cores = 1)
   clF <- makePSOCKcluster(cores, outfile = "bamInfoSamples.txt")
   list_bamInfo <- clusterApplyLB(cl = clF,
                                  x = listSamples,
-                                 fun = EventPointer:::getBamInfoPerSample,
+                                 fun = getBamInfoPerSample,
                                  region=region)
   on.exit(stopCluster(cl = clF))
   SGSeq:::checkApplyResultsForErrors(list_bamInfo,
@@ -195,8 +209,8 @@ getBamInfoPerSample <- function(sample_info, region)
   }
   
   si <- seqinfo(file_tmp)
-  sl <- seqlevels(si)
-  st <- rep(c("+"), length(si))
+  sl <- rep(seqlevels(si),2)
+  st <- c(rep(c("+"), length(si)),rep(c("-"), length(si)))
   which <- GRanges(sl, IRanges(1, seqlengths(si)[sl]), st)
   
   flag <-

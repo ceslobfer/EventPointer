@@ -1,13 +1,13 @@
 ---
-title: "EventPointerToolkit: An effective identification of alternative splicing events using RNA-Seq data"
+title: "EventPointer: An effective identification of alternative splicing events using RNA-Seq data"
 author: "Cesar Lobato-Fernandez, Juan A. Ferrer-Bonsoms & Angel Rubio"
 date: "`r BiocStyle::doc_date()`"
 abstract: >
-  The *EventPointerToolkit* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
+  The *EventPointer* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
 vignette: >
   %\VignetteEncoding{UTF-8}
-  %\VignetteIndexEntry{EventPointerToolkit}
-  %\VignettePackage{EventPointerToolkit}
+  %\VignetteIndexEntry{EventPointer}
+  %\VignettePackage{EventPointer}
   %\VignetteEngine{knitr::rmarkdown}
 output:
   BiocStyle::html_document:
@@ -21,7 +21,6 @@ editor_options:
 ```{r LoadFunctions, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 library(knitr)
 opts_chunk$set(error = FALSE)
-library(EventPointerToolkit)
 library(dplyr)
 library(kableExtra)
 ```
@@ -42,7 +41,7 @@ library(BiocManager)
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
-BiocManager::install("EventPointerToolkit")
+BiocManager::install("EventPointer")
 ```
 
 # Introduction
@@ -73,7 +72,7 @@ and EP_ST) into two steps. One part involves the detection, cataloging,
 and calculation of the Percent Spliced In (PSI) of events, and the other
 involves the statistical analysis related to the calculation of the PSI
 increment between conditions. 
-![**Figure 1.** General worflow EventPointerToolkit](Fig1_vignnete_EP.png)
+![**Figure 1.** General worflow EventPointer](Fig1_vignnete_EP.png)
 
 Both approaches share a common element within their respective workflows: the creation of a splicing graph. EventPointerBAM creates the splicing graph from aligned reads using aligners sensitive to junction reads (e.g., STAR). In contrast, EventPointerST utilizes the existing annotations of exons from each gene's isoforms to create the splicing graph, thus requiring only the relative abundances of these isoforms for its workflow.
 ![**Figure 2.** Splicing graph](SplicingGraph.png)
@@ -185,7 +184,7 @@ EventPointerStats_BAM(PSI_boots, Design, Contrast, cores=8, UseBootstrap=F,
 
 The following table shows an example of the results associated with the differential $\Psi$ analysis of the indicated comparisons performed by the EventPointerStats_BAM() function. It presents the $\Delta \Psi$ associated with each event of that contrast and its corresponding significance parameters.
 
-```{r EP_BAM_RES_TABLE, echo=FALSE}
+```{r EP_BAM_RES_TABLE,eval=FALSE, echo=FALSE}
 tableContrast1 <- read.csv(paste0(PathSGResult,"/EventPointerStatsResult/bootstrapResult/ResBootstrapContrast1.csv"),row.names = 1)
 kable(tableContrast1[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 1: EventPointerBAM results")
 ```

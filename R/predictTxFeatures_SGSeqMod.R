@@ -8,7 +8,7 @@ predictTxFeatures <- function(sample_info,
                               retain_coverage = FALSE,
                               junctions_only = FALSE,
                               min_junction_count = NULL,
-                              min_anchor = 1,
+                              min_anchor = 6,
                               max_complexity = 20,
                               min_n_sample = 1,
                               min_overhang = NA,
@@ -59,9 +59,9 @@ predictTxFeatures <- function(sample_info,
   )
   on.exit(stopCluster(cl = clF))
   featuresPerSample <- c()
-  for (sample in sample_info$sample_name) {
+  for (sample in sample_info$file_bam) {
     lFeaturesSample <- lapply(list_features, function(x) {
-      if (sample == x$sample_name) {
+      if (sample == x$fileBamName) {
         x$gr
       }
     })
@@ -240,13 +240,13 @@ predictTxFeaturesTotal <- function(sWhich,file_bam, paired_end, which,
                                    min_junction_count, psi, beta, gamma, min_anchor, include_counts,
                                    retain_coverage, junctions_only, max_complexity, sample_name, verbose){
   which <- sWhich$which
+  fileBamName <- sWhich$file_bam
   sample_name <- sWhich$sample_name
   seqlevel <- as.character(seqnames(which))
   
   file_bam <- sWhich$file_bam
   paired_end <- sWhich$paired_end
-  which <- sWhich$which
-  sample_name <- sWhich$sample_name
+
   min_junction_count <- sWhich$min_junction_count
   
   if (is(file_bam, "BamFile")) {
@@ -258,7 +258,6 @@ predictTxFeaturesTotal <- function(sWhich,file_bam, paired_end, which,
     si <- seqinfo(BamFile(file_bam))
     
   }
-  
   seqlevel <- as.character(seqnames(which))
   strand <- as.character(strand(which))
   #print(paste(c(seqlevel, strand), sep = " "))
@@ -272,14 +271,18 @@ predictTxFeaturesTotal <- function(sWhich,file_bam, paired_end, which,
     
     frag_exonic <- pairGap$gapPlus$frag_exonic
     frag_intron <- pairGap$gapPlus$frag_intron
-    grPlus <- constructPaired(frag_exonic, frag_intron, min_junction_count,
+    junctions_df <- pairGap$gapPlus$junctions_df
+    grPlus <- constructPaired(frag_exonic, frag_intron, junctions_df, min_junction_count,
                               psi, beta, gamma, min_anchor, include_counts, retain_coverage,
                               junctions_only, max_complexity, sample_name, seqlevel, "+", si)
     print(paste("    ",sample_name,seqlevel, "+",Sys.time(), sep = " "))
     
     frag_exonic <- pairGap$gapMinus$frag_exonic
     frag_intron <- pairGap$gapMinus$frag_intron
-    grMinus <- constructPaired(frag_exonic, frag_intron, min_junction_count,
+    junctions_df <- pairGap$gapMinus$junctions_df
+    # frag_exonic <- gapMinus$frag_exonic
+    # frag_intron <- gapMinus$frag_intron
+    grMinus <- constructPaired(frag_exonic, frag_intron, junctions_df, min_junction_count,
                                psi, beta, gamma, min_anchor, include_counts, retain_coverage,
                                junctions_only, max_complexity, sample_name, seqlevel, "-", si)
     
@@ -304,7 +307,7 @@ predictTxFeaturesTotal <- function(sWhich,file_bam, paired_end, which,
   
   gc(full=TRUE)
   if (verbose) generateCompleteMessage(paste(sample_name, gr2co(which)))
-  res <- list(sample_name=sample_name,gr=gr)
+  res <- list(fileBamName=fileBamName, gr=gr)
   
   return(res)
   
@@ -312,7 +315,8 @@ predictTxFeaturesTotal <- function(sWhich,file_bam, paired_end, which,
 predictJunctions <- function(frag_exonic, frag_intron,
                              min_junction_count, psi, min_anchor, retain_coverage)
 {
-  
+  # save(frag_exonic, frag_intron,
+  #        min_junction_count, psi, min_anchor, retain_coverage, file="D:/EventPointerToolkit/")
   ## extract all splice junctions
   junctions <- unique(unlist(frag_intron)) + 1
   if (length(junctions) == 0) { return() }
@@ -364,7 +368,10 @@ readGapPair <- function(file, paired_end, which, sample_name, verbose)
     
   }
   
-  flag <- scanBamFlag(isSecondaryAlignment = FALSE)
+  flag <- scanBamFlag(isSecondaryAlignment = FALSE,
+                      isPaired = T, isProperPair = T, 
+                      isUnmappedQuery = F,
+                      isNotPassingQualityControls=F)
   param <- ScanBamParam(flag = flag, tag = "XS", which = which)
   if (paired_end) {
     gap <- suppressWarnings(readGAlignmentPairs(file = file,
@@ -391,10 +398,23 @@ generateWarningMessage <- function (fun_name, item, msg)
 {
   message(makeWarningMessage(fun_name, item, msg))
 }
+
+# filterJunctions <- function(gap){
+#   gap_res <- gap[grepl("N", cigar(gap@first))]
+#   frag_intron[grepl("N", cigar(gap@fir))]
+#   
+# }
 fragExonIntron <- function(gap,strand,verbose){
   gap <- gap[mcols(gap)$strand %in% c(strand, "*")]
   frag_exonic <- reduce(ranges(grglist(gap, drop.D.ranges = TRUE)))
-  frag_intron <- ranges(junctions(gap))
+  frag_intron <- IRangesList(rep(list(IRanges()), length(gap)))
+  pos_junctions <- which((njunc(gap@first)<=1 | njunc(gap@last)<=1))
+  # frag_intron <- ranges(junctions(gap))
+  junctionsRanges <- ranges(junctions(gap[pos_junctions]))
+  frag_intron[pos_junctions] <- junctionsRanges
+  # junctions_df <- summarizeJunctions(gap[pos_junctions])
+  junctions_df <- NULL
+  # frag_intron <-ranges(junctions(gap))
   diff <- setdiff(frag_exonic, frag_intron)
   excl <- which(sum(width(frag_exonic)) > sum(width(diff)))
   
@@ -420,7 +440,7 @@ fragExonIntron <- function(gap,strand,verbose){
     
   }
   
-  gap <- list(frag_exonic = frag_exonic, frag_intron = frag_intron)
+  gap <- list(frag_exonic = frag_exonic, frag_intron = frag_intron, junctions_df = junctions_df)
   rm(frag_exonic)
   rm(frag_intron)
   return(gap)
@@ -428,7 +448,7 @@ fragExonIntron <- function(gap,strand,verbose){
 
 togroup0 <- S4Vectors:::quick_togroup
 
-constructPaired <- function(frag_exonic, frag_intron, min_junction_count,
+constructPaired <- function(frag_exonic, frag_intron, junctions_df, min_junction_count,
                             psi, beta, gamma, min_anchor, include_counts, retain_coverage,
                             junctions_only, max_complexity, sample_name, seqlevel, strand, si){
   
@@ -437,8 +457,7 @@ constructPaired <- function(frag_exonic, frag_intron, min_junction_count,
     gr <- NULL
     
   } else {
-    library(profvis)
-    ir <- predictSpliced(frag_exonic, frag_intron, min_junction_count,
+    ir <- predictSpliced(frag_exonic, frag_intron, junctions_df, min_junction_count,
                          psi, beta, gamma, min_anchor, include_counts, retain_coverage,
                          junctions_only, max_complexity, sample_name, seqlevel, strand)
     
@@ -475,12 +494,17 @@ co2str <- function (seqlevel, start, end, strand)
   paste0(seqlevel, ":", start, "-", end, ":", strand)
 }
 
-predictSpliced <- function(frag_exonic, frag_intron, min_junction_count,
+predictSpliced <- function(frag_exonic, frag_intron, junctions_df, min_junction_count,
                            psi, beta, gamma, min_anchor, include_counts, retain_coverage,
                            junctions_only, max_complexity, sample_name, seqlevel, strand)
 {
   junctions <- predictJunctions(frag_exonic, frag_intron,
                                 min_junction_count, psi, min_anchor, retain_coverage)
+  # junctions <- junctions_df
+  # mcols(junctions_df@ranges) <- data.frame(type=rep("J",length(junctions_df)),N=score(junctions_df))
+  # start(junctions_df@ranges)<-junctions_df@ranges@start-1
+  # end(junctions_df@ranges)<-end(junctions_df@ranges)+1
+  # junctions <- junctions_df@ranges
   if (is.null(junctions)) { return() }
   
   if (!junctions_only) {

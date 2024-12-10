@@ -14,7 +14,7 @@ EventPointerStats_BAM <- function(PSI_boots, Design, Contrast, cores=1,
     dir.create(pathResult)
   } 
   
-  result <- EventPointer:::checkContrastDesignMatrices(Contrast, Design)
+  result <- checkContrastDesignMatrices(Contrast, Design)
   if (result == TRUE){
     # if(UseVoom){
     #   resVoom <- voomEventPointerBAM(PSI_boots,Events,Design,Contrast)
@@ -26,12 +26,13 @@ EventPointerStats_BAM <- function(PSI_boots, Design, Contrast, cores=1,
     #   }
     # }
     # if(UseBootstrap){
+    UseBootstrap <- T
     resBootstrap <- EventPointer_Bootstraps(PSI_boots, Design, Contrast, cores, ram, nbootstraps,
                                             UseBootstrap, Threshold)
     pathResultBootstrap <- paste0(pathResult, "bootstrapResult/")
     dir.create(pathResultBootstrap)
     for (coef in c(1:dim(resBootstrap$Pvalues)[2])){
-      tableRes <- EventPointer:::ResulTable(resBootstrap, coef = coef)
+      tableRes <- ResulTable(resBootstrap, coef = coef)
       write.csv(tableRes,file = paste0(pathResultBootstrap,"ResBootstrapContrast",coef,".csv"))
     }
       

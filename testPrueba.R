@@ -39,7 +39,7 @@ SgFC
 load("D:/EventPointerBioconductor/PruebaPaquete/PSI_boots.RData")
 EventsTxt <- read.csv("D:/EventPointerBioconductor/PruebaPaquete/TotalEventsFound.csv",row.names = 1)
 EventsTxt<-"D:/EventPointerBioconductor/PruebaPaquete/TotalEventsFound.csv"
-PathGTF <- "D:/EventPointerToolkit/vignettes/"
+PathGTF <- "D:/EventPointer/vignettes/"
 EventPointerBAM_IGV(SG_RNASeq, EventsTxt, PathGTF)
 
 

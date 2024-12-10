@@ -71,7 +71,7 @@ EventPointerBAM_IGV <- function(SG_RNASeq, EventsTxt, PathGTF) {
   
   # Read EventsFound txt
   EventsInfo <- read.delim(file = EventsTxt, 
-                           sep = ",", header = TRUE, stringsAsFactors = FALSE,row.names = 1)
+                           sep = ",", header = TRUE, stringsAsFactors = FALSE)
   # xx<-paste(EventsInfo[,1],'_',EventsInfo[,2],sep='')
   # rownames(EventsInfo)<-xx
   

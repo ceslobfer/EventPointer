@@ -1507,7 +1507,17 @@ ClassifyEvents <- function(SG, Events, twopaths) {
       }
       
       if (is.null(Events[[XX]]$Type)) {
-        Events[[XX]]$Type <-reClassificationIntern(SG,Events[[XX]])
+        Events[[XX]]$Type <- tryCatch(
+          {
+            # Intentamos ejecutar la función
+            reClassificationIntern(SG, Events[[XX]])
+          },
+          error = function(e) {
+            # Esto se ejecuta si ocurre un error
+            # Asignamos un valor por defecto, por ejemplo, "Complex Event"
+            "Complex Event"
+          }
+        )
         # Events[[XX]]$Type <- "Complex Event"
         return(Events[[XX]])
       }

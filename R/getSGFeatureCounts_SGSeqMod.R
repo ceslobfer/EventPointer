@@ -44,7 +44,7 @@ listCHRFileCount <- function(which, valSample, list_features) {
 
 getSGFeatureCounts <- function(sample_info,
                                features,
-                               min_anchor = 1,
+                               min_anchor = 6,
                                counts_only = FALSE,
                                retain_coverage = FALSE,
                                verbose = FALSE,

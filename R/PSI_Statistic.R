@@ -14,7 +14,7 @@
 #' @examples
 #' \dontrun{
 #'       data(ArraysData)
-#'       PSI_Arrays_list<-EventPointer:::getPSI(ArraysData)
+#'       PSI_Arrays_list<-getPSI(ArraysData)
 #'       PSI_Arrays <- PSI_Arrays_list$PSI
 #'       Design <- matrix(c(1,1,1,1,0,0,1,1),nrow=4)
 #'       Contrast <- matrix(c(0,1),nrow=1)

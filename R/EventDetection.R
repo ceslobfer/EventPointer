@@ -78,8 +78,8 @@ EventDetection <- function(Input, cores,
       }
       
       
-      if (nrow(as.data.frame(SG_Gene)) != 
-          1) {
+      if ((nrow(as.data.frame(SG_Gene)) != 
+          1) & sum(type(SG_Gene)=="J")!=0) {
         featureID(SG_Gene) <- seq_len(nrow(as.data.frame(SG_Gene)))
         
         SG_Gene_Counts <- SgFC[geneID(SgFC) == 
@@ -90,7 +90,7 @@ EventDetection <- function(Input, cores,
         # Corresponds to the Edges, Adjacency
         # matrix and Incidence Matrix of the SG
         # that is being analyzed
-        SG <- EventPointer:::SG_Info(SG_Gene)
+        SG <- SG_Info(SG_Gene)
         
         # Using Ax=b with A the incidence matrix
         # and b=0, we solve to obtain the null
@@ -98,7 +98,7 @@ EventDetection <- function(Input, cores,
         # edge if we relate the SG with an
         # hydraulic installation
         
-        randSol <- EventPointer:::getRandomFlow(SG$Incidence, 
+        randSol <- getRandomFlow(SG$Incidence, 
                                                 ncol = 10)
         
         # To find events, we need to have fluxes
@@ -294,7 +294,7 @@ EventDetectionAnn <- function(Input, cores) {
         # Corresponds to the Edges, Adjacency
         # matrix and Incidence Matrix of the SG
         # that is being analyzed
-        SG <- EventPointer:::SG_Info(SG_Gene)
+        SG <- SG_Info(SG_Gene)
         
         # Using Ax=b with A the incidence matrix
         # and b=0, we solve to obtain the null
@@ -302,7 +302,7 @@ EventDetectionAnn <- function(Input, cores) {
         # edge if we relate the SG with an
         # hydraulic installation
         
-        randSol <- EventPointer:::getRandomFlow(SG$Incidence, 
+        randSol <- getRandomFlow(SG$Incidence, 
                                                 ncol = 10)
         
         # To find events, we need to have fluxes
@@ -315,7 +315,7 @@ EventDetectionAnn <- function(Input, cores) {
           # previously.  The number of fluxes
           # correspond to the number of edges so we
           # can relate events with edges
-          Events <- EventPointer:::findTriplets(randSol)
+          Events <- findTriplets(randSol)
           
           # There should be al least one event to
           # continue the algorithm
@@ -329,7 +329,7 @@ EventDetectionAnn <- function(Input, cores) {
             # edges are divided into Path 1, Path 2
             # and Reference
             
-            Events <- EventPointer:::getEventPaths(Events, 
+            Events <- getEventPaths(Events, 
                                                    SG)
             
             
@@ -342,14 +342,14 @@ EventDetectionAnn <- function(Input, cores) {
               # Classify the events into canonical
               # categories using the adjacency matrix
               
-              Events <- EventPointer:::ClassifyEvents(SG, 
+              Events <- ClassifyEvents(SG, 
                                                       Events, twopaths)
               
               # A simple piece of code to get the
               # number of counts for the three paths in
               # every event within a gene
               
-              # Events <- EventPointer:::GetCounts(Events, 
+              # Events <- GetCounts(Events, 
               #                     SG_Gene_Counts)
               # 
               # Events <- Filter(Negate(is.null), 
@@ -369,7 +369,7 @@ EventDetectionAnn <- function(Input, cores) {
               
               
               
-              Info <- EventPointer:::AnnotateEvents_RNASeq(Events)
+              Info <- AnnotateEvents_RNASeq(Events)
               # browser()
               
               return(list(Events = Events, 
