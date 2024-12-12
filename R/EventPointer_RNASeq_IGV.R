@@ -31,7 +31,7 @@
 #'    }
 #' @export
 
-EventPointerBAM_IGV <- function(SG_RNASeq, EventsTxt, PathGTF) {
+EventPointerBAM_IGV <- function(SG_RNASeq, EventsCSV, PathGTF) {
   
   if (is.null(SG_RNASeq)) {
     stop("Missing splicing graphs information")
