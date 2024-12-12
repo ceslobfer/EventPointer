@@ -63,7 +63,7 @@ EventsDetection_BAM <- function(PathSamplesAbundance,
                                  max_complexity = max_complexity,
                                  min_anchor = min_anchor)  
   }
-  # closeAllConnections()
+  closeAllConnections()
   seqlevelsStyle(TxF_Ref) <- seqlevelsStyle(TxF_mod)
   
   features <- convertToSGFeatures(TxF_mod)
@@ -103,7 +103,7 @@ EventsDetection_BAM <- function(PathSamplesAbundance,
   
   cat("\n DONE!")
   closeAllConnections()
-  # return(EventsDetection_pred)
+
 }
 
 AnnEventsFunc <- function(EventsDetection_pred, EventsDetection_ann, cores){

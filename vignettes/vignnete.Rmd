@@ -71,11 +71,18 @@ the user, we have divided each workflow of the two approaches (EP_BAM
 and EP_ST) into two steps. One part involves the detection, cataloging,
 and calculation of the Percent Spliced In (PSI) of events, and the other
 involves the statistical analysis related to the calculation of the PSI
-increment between conditions. 
-![**Figure 1.** General worflow EventPointer](Fig1_vignnete_EP.png)
+increment between conditions. ![Figure 1. General worflow
+EventPointer](Fig1_vignnete_EP.png)
 
-Both approaches share a common element within their respective workflows: the creation of a splicing graph. EventPointerBAM creates the splicing graph from aligned reads using aligners sensitive to junction reads (e.g., STAR). In contrast, EventPointerST utilizes the existing annotations of exons from each gene's isoforms to create the splicing graph, thus requiring only the relative abundances of these isoforms for its workflow.
-![**Figure 2.** Splicing graph](SplicingGraph.png)
+Both approaches share a common element within their respective
+workflows: the creation of a splicing graph. EventPointerBAM creates the
+splicing graph from aligned reads using aligners sensitive to junction
+reads (e.g., STAR). In contrast, EventPointerST utilizes the existing
+annotations of exons from each gene's isoforms to create the splicing
+graph, thus requiring only the relative abundances of these isoforms for
+its workflow.
+
+![Figure 2. Definition Events](EventDefinitionPackage.png)
 
 # EventPointerBAM
 
@@ -122,7 +129,7 @@ associated PSI. The required input for the function is described below:
 -   **AnnEvetns**: Boolean parameter indicating whether or not to
     perform the annotation process on the events to classify them as
     possible novo. (This process can take some time)
--   **PathSGResult**: Folder where save the function result.  $\Psi$ and
+-   **PathSGResult**: Folder where save the function result. $\Psi$ and
     splicing graph objects in RData format.
 
 Using EventsDetection_BAM function:
@@ -136,14 +143,15 @@ PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
 PathSGResult <- tempdir()
 EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF, 
                                       cores = 9, region=16, AnnEvents=T,
-                                      min_junction_count = 5, max_complexity = 50,
+                                      min_junction_count = 2, max_complexity = 30,
                                       PathSGResult = PathSGResult)
 
 ```
 
 ## EventPointerStats_BAM()
 
-This function performs the differential comparison between sample groups for the calculation of delta PSI.
+This function performs the differential comparison between sample groups
+for the calculation of delta PSI.
 
 ### *Parameters*:
 
@@ -182,7 +190,11 @@ EventPointerStats_BAM(PSI_boots, Design, Contrast, cores=8, UseBootstrap=F,
 
 ### *Result format*:
 
-The following table shows an example of the results associated with the differential $\Psi$ analysis of the indicated comparisons performed by the EventPointerStats_BAM() function. It presents the $\Delta \Psi$ associated with each event of that contrast and its corresponding significance parameters.
+The following table shows an example of the results associated with the
+differential $\Psi$ analysis of the indicated comparisons performed by
+the EventPointerStats_BAM() function. It presents the $\Delta \Psi$
+associated with each event of that contrast and its corresponding
+significance parameters.
 
 ```{r EP_BAM_RES_TABLE,eval=FALSE, echo=FALSE}
 tableContrast1 <- read.csv(paste0(PathSGResult,"/EventPointerStatsResult/bootstrapResult/ResBootstrapContrast1.csv"),row.names = 1)
@@ -192,8 +204,8 @@ kable(tableContrast1[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 1:
 Obtendremos una tabla como la mostrada por cada contraste indicado en
 nuestra matriz de contraste. El sistema de archivos resultante tanto de
 la funcion `EventPointerStats_BAM()` y `EventsDetection_BAM()` será el
-siguiente: 
-![**Figure 3.** Output EventPointerBAM functions](ImagenFicherosResultados.drawio.png)
+siguiente: ![Figure 3. Output EventPointerBAM
+functions](ImagenFicherosResultados.drawio.png)
 
 ## IGV visualization
 
@@ -230,14 +242,27 @@ directory.
 
 # EventPointerST
 
-Similar to EventPointerBAM, the aim of EventPointerST is to perform detection, classification, quantification, and differential analysis between conditions using RNA-seq sequence alignments as input data. However, the method employed for this purpose relies on previously known and annotated events provided in a GTF annotation format. Therefore, the preliminary sequence alignment step is carried out using pseudoaligners that depend on transcript annotations for the assignment of relative abundances. Limiting the identification to annotated events significantly increases the computational speed of the algorithm and makes it more transferable across different RNA-seq sequencing runs, as the detected events are not dependent on the sequencing itself but on the previously provided annotations for initial event identification. Pre-identification of events based on annotation prevents sequencing noise from affecting identification, thereby reducing false positives.
+Similar to EventPointerBAM, the aim of EventPointerST is to perform
+detection, classification, quantification, and differential analysis
+between conditions using RNA-seq sequence alignments as input data.
+However, the method employed for this purpose relies on previously known
+and annotated events provided in a GTF annotation format. Therefore, the
+preliminary sequence alignment step is carried out using pseudoaligners
+that depend on transcript annotations for the assignment of relative
+abundances. Limiting the identification to annotated events
+significantly increases the computational speed of the algorithm and
+makes it more transferable across different RNA-seq sequencing runs, as
+the detected events are not dependent on the sequencing itself but on
+the previously provided annotations for initial event identification.
+Pre-identification of events based on annotation prevents sequencing
+noise from affecting identification, thereby reducing false positives.
 
 ## EventsDetection_ST()
 
 The `EventsDetection_ST()` function represents the initial step in the
 EventPointerST workflow. Similar to EventPointerBAM, this function is
 responsible for creating the splicing graph, identifying events, and
-obtaining the  $\Psi$ from abundance data. In this case, by basing the
+obtaining the $\Psi$ from abundance data. In this case, by basing the
 identification of events on the annotation, we can provide data from
 previously detected events to avoid the steps of splicing graph
 generation and event identification for an annotation that has already
@@ -263,30 +288,35 @@ EventsPSI <- EventsDetection_ST(PathSamplesAbundance,PathTranscriptomeGTF = Path
 -   **EventsTranscriptome**: Events detected from a previos
     identification from a GTF.
 -   **PathEventsGTFResults:** Path where the detected event data from a
-    GTF file and the  $\Psi$ results will be generated.
+    GTF file and the $\Psi$ results will be generated.
 -   **Bootstrap:** Boolean indicating whether to perform the PSI
     bootstrap.
--   **typeAbundance:** Type of abundance files provided for the PSI analysis. The options are "salmon" or "kallisto".
--   **Filter:** Boolean variable to indicate if an expression filter is applied. Default FALSE.
+-   **typeAbundance:** Type of abundance files provided for the PSI
+    analysis. The options are "salmon" or "kallisto".
+-   **Filter:** Boolean variable to indicate if an expression filter is
+    applied. Default FALSE.
 -   **Qn:** Quantile used to filter the events (Bounded between 0-1, Q1
     would be 0.25).
 
 ## EventPointerStats_ST()
 
-This function performs the differential comparison between sample groups for the calculation of delta PSI.
+This function performs the differential comparison between sample groups
+for the calculation of delta PSI.
 
 ### *Parameters*:
 
--   **PSI**: RData variable resulting  from EventsDetection_ST()
+-   **PSI**: RData variable resulting from EventsDetection_ST()
 -   **Design**: A matrix defining the linear model. Each row corresponds
     to an array, and each column corresponds to a coefficient (such as
     the baseline and treatment effects).
 -   **Contrast**: A numeric matrix with contrasts to be tested. Rows
     correspond to coefficients in the design matrix, and columns
     correspond to contrasts.
--   **BootstrapStats**: Boolean variable to indicate if bootstrap step in PSI is applicated.
--   **PSI**: RData variable resulting  from EventsDetection_ST()
--   **UsePseudoAligBootstrap**: TRUE (default) if bootstrap data from pseudoaligment want to be used or FALSE if not.
+-   **BootstrapStats**: Boolean variable to indicate if bootstrap step
+    in PSI is applicated.
+-   **PSI**: RData variable resulting from EventsDetection_ST()
+-   **UsePseudoAligBootstrap**: TRUE (default) if bootstrap data from
+    pseudoaligment want to be used or FALSE if not.
 -   **nbootstraps**: How many layers, Bootstraps or samplings are going
     to be used. Caution, high numbers increase computational time.
 -   **cores**: The number of cores desired to use.
@@ -309,15 +339,18 @@ EventPointerStats_ST(PSI, Design, Contrast, cores=1,
 
 ```
 
-The output format of the event table resulting from the EventPointerStats_ST() function is similar to that of its counterpart in EventPointerBAM. The structure of the folder containing the complete workflow results is as follows:
-![**Figure 5.** Output EventPointerST functions](archivosEPST.drawio.png)
-
-
+The output format of the event table resulting from the
+EventPointerStats_ST() function is similar to that of its counterpart in
+EventPointerBAM. The structure of the folder containing the complete
+workflow results is as follows: ![Figure 5. Output EventPointerST
+functions](archivosEPST.drawio.png)
 
 # References
 
--   Ferrer-Bonsoms, Juan A., et al. "EventPointer 3.0: flexible and accurate splicing analysis that includes studying the differential usage of protein-domains" NAR Genomics and Bioinformatics
-    4,3 (2022).
+-   Ferrer-Bonsoms, Juan A., et al. "EventPointer 3.0: flexible and
+    accurate splicing analysis that includes studying the differential
+    usage of protein-domains" NAR Genomics and Bioinformatics 4,3
+    (2022).
 -   Romero, Juan P., et al. "Comparison of RNA-seq and microarray
     platforms for splice event detection using a cross-platform
     algorithm." BMC genomics 19.1 (2018): 703.
