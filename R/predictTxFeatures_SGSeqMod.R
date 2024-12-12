@@ -316,7 +316,7 @@ predictJunctions <- function(frag_exonic, frag_intron,
                              min_junction_count, psi, min_anchor, retain_coverage)
 {
   # save(frag_exonic, frag_intron,
-  #        min_junction_count, psi, min_anchor, retain_coverage, file="D:/EventPointerToolkit/")
+  #        min_junction_count, psi, min_anchor, retain_coverage, file="D:/EventPointer/")
   ## extract all splice junctions
   junctions <- unique(unlist(frag_intron)) + 1
   if (length(junctions) == 0) { return() }

@@ -1,9 +1,9 @@
 ---
 title: "EventPointer: An effective identification of alternative splicing events using RNA-Seq data"
-author: "Cesar Lobato-Fernandez, Juan A. Ferrer-Bonsoms & Angel Rubio"
+author: "Cesar Lobato-Fernandez, Laura Jareño, Juan A. Ferrer-Bonsoms & Angel Rubio"
 date: "`r BiocStyle::doc_date()`"
 abstract: >
-  The *EventPointer* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
+  *EventPointer* R package offers a streamlined method for identifying, classifying, and visualizing alternative splicing events using RNA-seq data. There are two primary workflows: EventPointerBAM (EP_BAM), which utilizes BAM files from splice-aware aligners (e.g., STAR) to detect, classify, and quantify splicing events, allowing for de novo event detection; and EventPointerST (EP_ST), which relies on GTF transcriptome annotations and quantification from pseudoaligners (e.g., salmon, kallisto) for event detection and classification. Each workflow is divided into two steps: detecting, cataloging, and calculating the Percent Spliced In (PSI) of events, and performing statistical analysis to calculate PSI increments between conditions.
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteIndexEntry{EventPointer}
@@ -13,6 +13,7 @@ output:
   BiocStyle::html_document:
     toc: true
     fig_caption: true
+    toc_depth: 2
 editor_options: 
   markdown: 
     wrap: 72
@@ -25,14 +26,14 @@ library(dplyr)
 library(kableExtra)
 ```
 
-```{r style, echo = FALSE, results = 'asis'}
-##BiocStyle::markdown()
+```{r style, echo = FALSE}
+BiocStyle::markdown()
 ```
+
 
 # Installation
 
-EventPointer can be installed from Bioconductor using the BiocManager
-package:
+EventPointer can be installed from Bioconductor using the BiocManager package:
 
 ```{r, eval=FALSE}
 
@@ -44,328 +45,328 @@ if (!requireNamespace("BiocManager", quietly=TRUE))
 BiocManager::install("EventPointer")
 ```
 
+
 # Introduction
 
-The *EventPointer* R package provides users with a simplified method to
-identify, classify, and visualize alternative splicing events using
-RNA-seq data. There are two types of workflows to follow using
-EventPointer, both aiming for the same objective but employing different
-approaches to achieve it:
+*EventPointer* R package provides users with a simplified method to identify, classify, and visualize alternative splicing events using RNA-seq data. It is possible to follow two different workflows with EventPointer, both aiming for the same objective but employing different approaches to achieve it:
 
--   *EventPointerBAM (EP_BAM)* The initial files for this workflow are
-    the BAM files resulting from the alignment of RNA-seq sequences. The
-    alignment should be performed using a splice-aware aligner
-    (recommended example: STAR). From these files, the detection,
-    classification, and quantification of splicing events are carried
-    out. The main advantage of this methodology is its ability to detect
-    de novo events based on the alignment of reads.
+* **EventPointerBAM (EP_BAM)**: The detection, classification and quantification of splicing events is carried out using the BAM files generated from RNA-seq sequence alignment. It should be noted that the alignment must be performed using an aligner that takes splicing into account (recommended tool: STAR). The main advantage of this methodology is its ability to detect de novo events based on reads alignment. 
 
--   *EventPointerST (EP_ST)* In this case, the detection and
-    classification of events are determined by the corresponding
-    transcriptome annotation in GTF format. The quantification files of
-    transcripts come from pseudoaligners (examples: salmon and
-    kallisto).
+* **EventPointerST (EP_ST)**: The detection and classification of events are determined by the corresponding transcriptome annotation in GTF format. In this case, the quantification files of transcripts come from pseudoaligners (examples: salmon or kallisto).
 
-To simplify the overall analysis procedure of alternative splicing for
-the user, we have divided each workflow of the two approaches (EP_BAM
-and EP_ST) into two steps. One part involves the detection, cataloging,
-and calculation of the Percent Spliced In (PSI) of events, and the other
-involves the statistical analysis related to the calculation of the PSI
-increment between conditions. ![Figure 1. General worflow
-EventPointer](Fig1_vignnete_EP.png)
+To simplify the overall analysis procedure of alternative splicing for the user, we have divided each workflow (EP_BAM and EP_ST) in two steps as shown in Figure 1. One part involves the detection, classification, and calculation of the Percent Spliced In (PSI) of events, and the other consists of the statistical analysis of the calculation of the PSI increment between conditions. 
 
-Both approaches share a common element within their respective
-workflows: the creation of a splicing graph. EventPointerBAM creates the
-splicing graph from aligned reads using aligners sensitive to junction
-reads (e.g., STAR). In contrast, EventPointerST utilizes the existing
-annotations of exons from each gene's isoforms to create the splicing
-graph, thus requiring only the relative abundances of these isoforms for
-its workflow.
+![Figure 1 (A) Worflow and advantages and disadvantages of EventPointerBAM. (A) Worflow and advantages and disadvantages of EventPointerST.](1_workflowEP.png)
 
-![Figure 2. Definition Events](EventDefinitionPackage.png)
+
+Figure 2 shows the process of identification and classification of events in each workflow and it can be seen that both approaches share a common element: the creation of a splicing graph. However, *EventPointerBAM* creates the splicing graph from aligned reads using aligners sensitive to junction reads (e.g., STAR). In contrast, *EventPointerST* uses the existing annotations of exons from each gene's isoforms to create the splicing graph, thus requiring only the relative abundances of these isoforms for its workflow.
+
+![Figure 2. (A) Reads alignment and event identification. (B) Splicing graph construction. (C) Events classification in EventPointerST and EventPointerBAM.](2_EventDefinition.png)
+
 
 # EventPointerBAM
 
-The aim of EventPointerBAM is to perform detection, classification,
-quantification and differential analysis between conditions using as
-input data sequence alignments of RNA-seq data performed using aligners
-sensitive to junction reads. *Advantages: De novo event detection.*
-*Disadvantages: Higher computational cost. More sensitive to sequencing
-and alignment errors.*
+The aim of EventPointerBAM is to perform detection, classification, quantification and differential analysis between conditions, using as input data sequence alignments of RNA-seq data performed using aligners sensitive to junction reads. 
+
 
 ## EventsDetection_BAM()
 
-This function is responsible for the detection of events from the input
-alignment files, their classification and the calculation of the
-associated PSI. The required input for the function is described below:
+This function is responsible for the detection of events from the input alignment files, their classification and the calculation of the associated PSI. The inputs for the function are described below:
 
--   **PathSamplesAbundance** : Path to bam files or path to folder with
-    bam files.
 
--   **PathTranscriptomeGTF**: Path to the trascriptome annotation in GTF
-    format.
+### *Bams and GTF file parameters*
 
-### *Detection parameters*:
+* **PathSamplesAbundance**: Path to bam and bai files or path to folder with bam and bai files.
 
--   **min_junction_count** : Minimum fragment count required for a
-    splice junction to be included in the splicing gaph.
--   **max_complexity**: Maximum allowed complexity. If a locus exceeds
-    this threshold, it is skipped, resulting in a warning. Complexity is
-    defined as the maximum number of unique predicted splice junctions
-    overlapping a given position. High complexity regions are often due
-    to spurious read alignments and can slow down processing.
--   **region**: Numerical vector indicating the regions (at the
-    chromosomal level) to be used for event searching.
+* **PathTranscriptomeGTF**: Path to file containing the regions to be analysed from the bam files in GTF format.
 
-### *PSI calculation parameters*:
 
--   **nboot**: Number of resamples of the quantification of the samples
-    to perform bootstrap.
--   **lambda**:
+### *Detection parameters*
 
-### *Performance & results parameters*:
+* **region**: Numerical vector indicating the index of positions (at chromosomal level) to be analysed from the GTF. Default value is NULL so that all regions are analysed. 
 
--   **cores**: Nº of cores used for the function.
--   **AnnEvetns**: Boolean parameter indicating whether or not to
-    perform the annotation process on the events to classify them as
-    possible novo. (This process can take some time)
--   **PathSGResult**: Folder where save the function result. $\Psi$ and
-    splicing graph objects in RData format.
+* **min_junction_count**: Minimum number of junctions detected in the alignment to be considered in the splicing graph. Default value is 2. 
 
-Using EventsDetection_BAM function:
+* **max_complexity**: Maximum allowed complexity. If a locus exceeds this threshold, it is skipped, resulting in a warning. Complexity is defined as the maximum number of unique predicted splice junctions overlapping a given position. High complexity regions are often due to spurious read alignments and can slow down processing. Default value is 30. 
+
+* **min_n_sample**: Minimum number of samples that a junction must have to be considered. Default value is 3.
+
+* **min_anchor**: Minimum number of aligned bases at one end of an exon to consider a junction. Default value is 6. 
+
+
+### *PSI calculation parameters*
+
+* **nboot**: Number of resamples of the quantification of the samples to perform bootstrap. Default value is 20. 
+
+* **lambda**:
+
+
+### *Performance parameters*
+
+* **cores**: Nº of cores used for the function. Default value is 1. 
+
+
+### *Results parameters*
+
+* **PathSGResult**: Path where to save the following 4 files: 
+
+  * **TotalEventsFound.csv**: General data for total events detected in csv format. 
+  * **EventsDetection_EPBAM.RData**: Raw data per event, paths of splicing graph and counts in RData format. 
+  * **SgFC.RData**: Contains the splicing graph in RData format.
+  * **PSI_boots.RData**: $\Psi$ per event and sample in RData format.
+
+
+### *Command example*
+
+Using `EventsDetection_BAM` function:
 
 ```{r, eval=FALSE, warning=FALSE, collapse=TRUE}
 
 PathSamplesAbundance <- system.file("extdata/bams", package = "EventPointer")
-
 PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
 
 PathSGResult <- tempdir()
-EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF, 
-                                      cores = 9, region=16, AnnEvents=T,
-                                      min_junction_count = 2, max_complexity = 30,
-                                      PathSGResult = PathSGResult)
+
+EventsDetection_BAM(PathSamplesAbundance, 
+                    PathTranscriptomeGTF, 
+                    region = 16,
+                    min_junction_count = 2, 
+                    max_complexity = 30,
+                    min_n_sample = NULL,
+                    min_anchor = 6,
+                    nboot = 20,
+                    lambda = NULL,
+                    cores = 1,
+                    PathSGResult = PathSGResult)
 
 ```
+
 
 ## EventPointerStats_BAM()
 
-This function performs the differential comparison between sample groups
-for the calculation of delta PSI.
+This function performs the differential comparison between sample groups for the calculation of delta PSI. The inputs for the function are described below:
 
-### *Parameters*:
 
--   **Design**: A matrix defining the linear model. Each row corresponds
-    to an array, and each column corresponds to a coefficient (such as
-    the baseline and treatment effects).
--   **Contrast**: A numeric matrix with contrasts to be tested. Rows
-    correspond to coefficients in the design matrix, and columns
-    correspond to contrasts.
--   **Threshold**: it assigns a threshold to compute the pvalues.
-    Default = 0
--   **UseBootstrap**: Boolean variable to indicate if bootstrap step in
-    $\Psi$ is applicated.
--   **nbootstraps**: How many layers, Bootstraps or samplings are going
-    to be used. Caution, high numbers increase computational time.
--   **cores**: The number of cores desired to use.
--   **pathResult**: Folder where save the function result.
+### *Statistical analysis parameters*
 
-### *Command example*:
+* **PSI_boots**: *PSI_boots.RData* obtained in `EventsDetection_BAM` function. 
+
+* **Design**: A matrix defining the linear model. Each row corresponds to an array, and each column corresponds to a coefficient (such as the baseline and treatment effects).
+
+* **Contrast**: A numeric matrix with contrasts to be tested. Rows correspond to coefficients in the design matrix, and columns correspond to contrasts.
+
+* **Threshold**: It assigns a threshold to compute the p-values. Default value is 0. 
+
+* **nbootstraps**: How many layers, Bootstraps or samplings are going to be used. Caution, high numbers increase computational time.
+
+
+### *Performance parameters*
+
+* **cores**: The number of cores desired to use.
+
+
+### *Results parameters*
+
+* **pathResult**: Folder where save the result that consists of a table with the results associated with the differential $\Psi$ analysis of the indicated contrasts. It presents the $\Delta \Psi$ associated with each events of that contrast and its corresponding significance parameters. Note that a table will be obtained for each contrast indicated in contrast matrix. 
+
+
+### *Command example*
 
 ```{r, eval=FALSE, warning=FALSE, collapse=TRUE}
+
 data(PSI_boots)
-#Creation of design matrix
-Design <- cbind(rep(1,9),
-                 rep(c(1,0,0),3),
-                 rep(c(0,1,0),3))
-#Creation of contrast matrix
-Contrast <- cbind(
-  c(0,1,0),
-  c(0,0,1))
 
-EventPointerStats_BAM(PSI_boots, Design, Contrast, cores=8, UseBootstrap=F,
-                  Threshold = 0, nbootstraps = 1000, pathResult = PathSGResult)
+Design <- cbind(rep(1,9),rep(c(1,0,0),3),rep(c(0,1,0),3))
+Contrast <- cbind(c(0,1,0),c(0,0,1))
+
+EventPointerStats_BAM(PSI_boots, 
+                      Design, 
+                      Contrast, 
+                      Threshold = 0,
+                      nbootstraps = 1000,
+                      cores=1, 
+                      ram = 0.1, 
+                      pathResult = PathSGResult)
 
 ```
 
-### *Result format*:
 
-The following table shows an example of the results associated with the
-differential $\Psi$ analysis of the indicated comparisons performed by
-the EventPointerStats_BAM() function. It presents the $\Delta \Psi$
-associated with each event of that contrast and its corresponding
-significance parameters.
+## Summary
 
-```{r EP_BAM_RES_TABLE,eval=FALSE, echo=FALSE}
-tableContrast1 <- read.csv(paste0(PathSGResult,"/EventPointerStatsResult/bootstrapResult/ResBootstrapContrast1.csv"),row.names = 1)
-kable(tableContrast1[1:5,],digits=5,row.names=TRUE,align="c",caption = "Table 1: EventPointerBAM results")
-```
+When running both `EventsDetection_BAM()` and `EventPointerStats_BAM()`, the resulting files at the defined output folder will be those shown in Figure 3. 
 
-Obtendremos una tabla como la mostrada por cada contraste indicado en
-nuestra matriz de contraste. El sistema de archivos resultante tanto de
-la funcion `EventPointerStats_BAM()` y `EventsDetection_BAM()` será el
-siguiente: ![Figure 3. Output EventPointerBAM
-functions](ImagenFicherosResultados.drawio.png)
+![Figure 3. Output EventPointerBAM functions.](3_ficheros_EPBAM.drawio.png)
+
 
 ## IGV visualization
 
-The alternative splicing events detected by EventPointerBAM can be
-visualized using the `EventPointerBAM_IGV()` function. This function
-displays the paths that make up the splicing graph of each event in a
-gtf format that can be viewed using the IGV program. Each event is
-composed of 3 paths: path1, path2, and Reference, which will be
-indicated along with the event id for identification as "path1\_",
-"path2\_", "Ref_1", and "Ref_2".
+Alternative splicing events detected by EventPointerBAM can be visualized using the `EventPointerBAM_IGV()` function as shown in Figure 4. This function displays the paths that make up the splicing graph of each event in a gtf format that can be viewed using the IGV program. Each event is composed of 3 paths: path1, path2, and Reference, which will be indicated along with the event id for identification as "path1\_", "path2\_", "Ref_1", and "Ref_2".
 
-![**Figure 4.** EventPointer visualization using IGV](ImagenIGV.png)
+![**Figure 4.** EventPointer visualization using IGV.](4_IGV.png)
 
-To create the GTF files, the algorithm uses the `EventPointerBAM_IGV()`
-function with the following parameters:
+To create the GTF files, the algorithm uses the `EventPointerBAM_IGV()` function with the following parameters:
 
--   **SG_RNASeq**: Data.frame generated by EventPointer with the events
-    to be included in the GTF file.
--   **EventsTxt**: Reference transcriprome. Must be one of: "Ensembl",
-    "UCSC" , "AffyGTF" or "CustomGTF".
--   **PathGTF**: If input is "AffyGTF" or "CustomGTF", inputFile should
-    point to the GTF file to be used.
+
+### *Events and reference transcriptome parameters*
+
+* **SG_RNASeq**: Data.frame generated by EventPointerBAM with the events to be included in the GTF file.
+* **EventsTxt**: Reference transcriptome. Must be one of: "Ensembl", "UCSC", "AffyGTF" or "CustomGTF".
+
+
+### *Results parameters*
+
+* **PathGTF**: Folder where to save the generated GTF file. 
 
 ```{r, eval=FALSE, collapse=TRUE}
+
 EventsTxt<-paste(system.file("extdata",package="EventPointer"),"/TotalEventsFound.csv",sep="")
 load(paste(system.file("extdata",package="EventPointer"),"/SgFC.RData",sep=""))
 SG_RNASeq <- SgFC
 PathGTF <- tempdir()
-EventPointerBAM_IGV(SG_RNASeq, EventsTxt, PathGTF)
+
+EventPointerBAM_IGV(SG_RNASeq, 
+                    EventsTxt, 
+                    PathGTF)
 ```
 
-Once the process is completed one GTF file is generated in the specified
-directory.
+
 
 # EventPointerST
 
-Similar to EventPointerBAM, the aim of EventPointerST is to perform
-detection, classification, quantification, and differential analysis
-between conditions using RNA-seq sequence alignments as input data.
-However, the method employed for this purpose relies on previously known
-and annotated events provided in a GTF annotation format. Therefore, the
-preliminary sequence alignment step is carried out using pseudoaligners
-that depend on transcript annotations for the assignment of relative
-abundances. Limiting the identification to annotated events
-significantly increases the computational speed of the algorithm and
-makes it more transferable across different RNA-seq sequencing runs, as
-the detected events are not dependent on the sequencing itself but on
-the previously provided annotations for initial event identification.
-Pre-identification of events based on annotation prevents sequencing
-noise from affecting identification, thereby reducing false positives.
+Similar to EventPointerBAM, the aim of EventPointerST is to perform detection, classification, quantification, and differential analysis between conditions using RNA-seq sequence alignments as input data. However, the method employed for this purpose relies on previously known and annotated events provided in a GTF annotation format. Therefore, the preliminary sequence alignment step is carried out using pseudoaligners that depend on transcript annotations for the assignment of relative abundances. Limiting the identification to annotated events significantly increases the computational speed of the algorithm and makes it more transferable across different RNA-seq sequencing runs, as the detected events are not dependent on the sequencing itself but on the previously provided annotations for initial event identification. Pre-identification of events based on annotation prevents sequencing noise from affecting identification, thereby reducing false positives.
+
 
 ## EventsDetection_ST()
 
-The `EventsDetection_ST()` function represents the initial step in the
-EventPointerST workflow. Similar to EventPointerBAM, this function is
-responsible for creating the splicing graph, identifying events, and
-obtaining the $\Psi$ from abundance data. In this case, by basing the
-identification of events on the annotation, we can provide data from
-previously detected events to avoid the steps of splicing graph
-generation and event identification for an annotation that has already
-been used.
+The `EventsDetection_ST()` function represents the initial step in the EventPointerST workflow. Similar to EventPointerBAM, this function is responsible for creating the splicing graph, identifying events, and obtaining the $\Psi$ from abundance data. In this case, as event identification is based on the annotation, we can provide previously detected events data to avoid the splicing graph generation and event identification steps, for an annotation that has already been used. 
+
+
+### *Abundance and GTF file parameters*
+
+* **PathSamplesAbundance**: Path to quantification data of gene isoforms obtained from the corresponding pseudoaligner.
+
+* **typeAbundance:** Type of abundance files provided for the PSI analysis. The options are "salmon" or "kallisto".
+
+* **PathTranscriptomeGTF**: Path to gene annotation GTF file.
+
+* **EventsTranscriptome**: Detected events for a GTF if you do not want to recalculate the GTF events.
+
+
+### *Calculation parameters*
+
+* **Bootstrap:** Boolean indicating whether to perform the PSI bootstrap. Default value is TRUE. 
+* **Filter:** Boolean variable to indicate if an expression filter is applied. Default FALSE.
+* **Qn:** Quantile used to filter the events (Bounded between 0-1, Q1 would be 0.25). Default value is 0.25. 
+
+
+### *Performance parameter*
+
+* **cores**: The number of cores desired to use.
+
+
+### *Results parameters*
+
+* **PathEventsGTFResults:** Path where the detected event data from a GTF file and the $\Psi$ results will be saved. The following files are obtained:
+
+  * **EventsTranscriptome.RData**: Detected events data in RData format. 
+  * **PSI_ST.RData**: $\Psi$ per event and sample in RData format.
+
 
 ```{r, eval=F}
+
 PathFiles<-system.file("extdata",package="EventPointer")
 PathTranscriptomeGTF <- paste(PathFiles,"/gencode.v24.ann_2genes.gtf",sep="")
 PathSamplesAbundance <- paste0(PathFiles,"/output")
 PathSamplesAbundance <- dir(PathSamplesAbundance,full.names = TRUE)
 Pathtxt <- tempdir()
-EventsPSI <- EventsDetection_ST(PathSamplesAbundance,PathTranscriptomeGTF = PathTranscriptomeGTF,
-                                PathEventsGTFResults=Pathtxt,
-                                cores=1, typeAbundance = "kallisto", Bootstrap=T, Filter=F,
-                                Qn = 0.25)
+
+EventsPSI <- EventsDetection_ST(PathSamplesAbundance, 
+                                typeAbundance = "kallisto",
+                                PathTranscriptomeGTF = PathTranscriptomeGTF, 
+                                EventsTranscriptome=NULL, 
+                                Bootstrap=T, 
+                                Filter=F, 
+                                Qn = 0.25, 
+                                cores=1,
+                                PathEventsGTFResults=Pathtxt)
 ```
 
-### *Parameters*:
 
--   **PathSamplesAbundance**: Path to quantification data of gene
-    isoforms obtained from the corresponding pseudoaligner.
--   **PathTranscriptomeGTF**: Path to gene annotation GTF file.
--   **EventsTranscriptome**: Events detected from a previos
-    identification from a GTF.
--   **PathEventsGTFResults:** Path where the detected event data from a
-    GTF file and the $\Psi$ results will be generated.
--   **Bootstrap:** Boolean indicating whether to perform the PSI
-    bootstrap.
--   **typeAbundance:** Type of abundance files provided for the PSI
-    analysis. The options are "salmon" or "kallisto".
--   **Filter:** Boolean variable to indicate if an expression filter is
-    applied. Default FALSE.
--   **Qn:** Quantile used to filter the events (Bounded between 0-1, Q1
-    would be 0.25).
 
 ## EventPointerStats_ST()
 
-This function performs the differential comparison between sample groups
-for the calculation of delta PSI.
+This function performs the differential comparison between sample groups for the calculation of delta PSI.
 
-### *Parameters*:
+### *Statistical analysis parameters*
 
--   **PSI**: RData variable resulting from EventsDetection_ST()
--   **Design**: A matrix defining the linear model. Each row corresponds
-    to an array, and each column corresponds to a coefficient (such as
-    the baseline and treatment effects).
--   **Contrast**: A numeric matrix with contrasts to be tested. Rows
-    correspond to coefficients in the design matrix, and columns
-    correspond to contrasts.
--   **BootstrapStats**: Boolean variable to indicate if bootstrap step
-    in PSI is applicated.
--   **PSI**: RData variable resulting from EventsDetection_ST()
--   **UsePseudoAligBootstrap**: TRUE (default) if bootstrap data from
-    pseudoaligment want to be used or FALSE if not.
--   **nbootstraps**: How many layers, Bootstraps or samplings are going
-    to be used. Caution, high numbers increase computational time.
--   **cores**: The number of cores desired to use.
--   **pathResult**: Folder where save the function result.
+* **PSI**: PSI_ST.RData variable resulting from `EventsDetection_ST()`. 
 
-### *Command example*:
+* **Design**: A matrix defining the linear model. Each row corresponds to an array, and each column corresponds to a coefficient (such as the baseline and treatment effects).
+
+* **Contrast**: A numeric matrix with contrasts to be tested. Rows correspond to coefficients in the design matrix, and columns correspond to contrasts.
+
+* **BootstrapStats**: Boolean variable to indicate if bootstrap step in PSI is applied.
+
+* **nbootstraps**: How many layers, Bootstraps or samplings are going to be used. Caution, high numbers increase computational time.
+
+* **UsePseudoAligBootstrap**: TRUE (default) if bootstrap data from pseudoaligment want to be used or FALSE if not.
+
+* **Threshold**: It assigns a threshold to compute the p-values. Default value is 0. 
+
+
+### *Performance parameters*
+
+* **cores**: The number of cores desired to use.
+
+
+### *Results parameters*
+
+* **pathResult**: Folder where to save the event table that is similar to that of its counterpart in EventPointerBAM.
+
+
+### *Command example*
 
 ```{r, eval=FALSE, warning=FALSE, collapse=TRUE}
+
 data(PSI_boots)
-#Creation of design matrix
+
 Design <- cbind(1,rep(c(0,1),each=2))
-#Creation of contrast matrix
 Contrast <- matrix(c(0,1),nrow=2)
 
 pathResult <- tempdir()
-EventPointerStats_ST(PSI, Design, Contrast, cores=1, 
-                                 BootstrapStats = T,nbootstraps= 10000, 
-                                 UsePseudoAligBootstrap = T,Threshold = 0,
-                                 pathResult=pathResult)
+
+EventPointerStats_ST(PSI, 
+                     Design, 
+                     Contrast, 
+                     BootstrapStats = T,
+                     nbootstraps= 10000,
+                     UsePseudoAligBootstrap = T,
+                     Threshold = 0,
+                     cores=1, 
+                     ram = 4, 
+                     pathResult=pathResult)
 
 ```
 
-The output format of the event table resulting from the
-EventPointerStats_ST() function is similar to that of its counterpart in
-EventPointerBAM. The structure of the folder containing the complete
-workflow results is as follows: ![Figure 5. Output EventPointerST
-functions](archivosEPST.drawio.png)
+
+## Summary
+
+When running both `EventsDetection_ST()` and `EventPointerStats_ST()`, the resulting files at the defined output folder will be those shown in Figure 5. 
+
+![Figure 5. Output EventPointerST functions](5_ficheros_EPST.drawio.png)
+
 
 # References
 
--   Ferrer-Bonsoms, Juan A., et al. "EventPointer 3.0: flexible and
-    accurate splicing analysis that includes studying the differential
-    usage of protein-domains" NAR Genomics and Bioinformatics 4,3
-    (2022).
--   Romero, Juan P., et al. "Comparison of RNA-seq and microarray
-    platforms for splice event detection using a cross-platform
-    algorithm." BMC genomics 19.1 (2018): 703.
--   Goldstein, Leonard D., et al. "Prediction and Quantification of
-    Splice Events from RNA-Seq Data." PloS one 11.5 (2016): e0156132.
--   Seshagiri, Somasekar, Eric W Stawiski, Steffen Durinck, Zora
-    Modrusan, Elaine E Storm, Caitlin B Conboy, Subhra Chaudhuri, et
-    al. 2012. "Recurrent R-spondin fusions in colon cancer." Nature 488
-    (7413): 660--64. \*Untergasser, A., Cutcutache, I., Koressaar, T.,
-    Ye, J., Faircloth, B. C., Remm, M., & Rozen, S. G. (n.d.).
-    Primer3-new capabilities and interfaces.
-    <https://doi.org/10.1093/nar/gks596>
+* Ferrer-Bonsoms, Juan A., et al. "EventPointer 3.0: flexible and accurate splicing analysis that includes studying the differential usage of protein-domains" NAR Genomics and Bioinformatics 4,3 (2022).
+* Romero, Juan P., et al. "Comparison of RNA-seq and microarray platforms for splice event detection using a cross-platform algorithm." BMC genomics 19.1 (2018): 703.
+* Goldstein, Leonard D., et al. "Prediction and Quantification of Splice Events from RNA-Seq Data." PloS one 11.5 (2016): e0156132.
+* Seshagiri, Somasekar, Eric W Stawiski, Steffen Durinck, Zora Modrusan, Elaine E Storm, Caitlin B Conboy, Subhra Chaudhuri, et al. 2012. "Recurrent R-spondin fusions in colon cancer." Nature 488 (7413): 660--64. \*Untergasser, A., Cutcutache, I., Koressaar, T., Ye, J., Faircloth, B. C., Remm, M., & Rozen, S. G. (n.d.). Primer3-new capabilities and interfaces.  <https://doi.org/10.1093/nar/gks596>
+
 
 # Session Information
 
 ```{r}
 sessionInfo()
 ```
+

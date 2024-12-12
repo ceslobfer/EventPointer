@@ -1,10 +1,10 @@
 
 EventsDetection_BAM <- function(PathSamplesAbundance, 
-                          PathTranscriptomeGTF = NULL, 
-                          cores = 1, region=NULL,
-                          min_junction_count = 2, max_complexity = 30,
-                          lambda = NULL,nboot = 20,min_n_sample = NULL,
-                          min_anchor = 6,
+                          PathTranscriptomeGTF = NULL,
+                          region = NULL, min_junction_count = 2,
+                          max_complexity = 30, min_n_sample = NULL,
+                          min_anchor = 6, nboot = 20, lambda = NULL,
+                          cores = 1,
                           PathSGResult = ".") {
   
   

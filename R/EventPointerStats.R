@@ -1,6 +1,11 @@
-EventPointerStats_BAM <- function(PSI_boots, Design, Contrast, cores=1,
-                              Threshold = 0, ram = 0.1,
-                              nbootstraps = 1000, pathResult = "./"){
+EventPointerStats_BAM <- function(PSI_boots, 
+                                  Design, 
+                                  Contrast, 
+                                  Threshold = 0, 
+                                  nbootstraps = 1000,
+                                  cores=1,
+                                  ram = 0.1,
+                                  pathResult = "./"){
 
   if(is.null(Design)){
     stop("Design field is empty")
@@ -16,16 +21,6 @@ EventPointerStats_BAM <- function(PSI_boots, Design, Contrast, cores=1,
   
   result <- checkContrastDesignMatrices(Contrast, Design)
   if (result == TRUE){
-    # if(UseVoom){
-    #   resVoom <- voomEventPointerBAM(PSI_boots,Events,Design,Contrast)
-    #   pathResultVoom <- paste0(pathResult, "voomResult/")
-    #   dir.create(pathResultVoom)
-    #   for(idContrast in c(1:length(resVoom))){
-    #     tableRes <- resVoom[[idContrast]]
-    #     write.csv(tableRes,file = paste0(pathResultVoom,"ResVoomContrast",idContrast,".csv"))
-    #   }
-    # }
-    # if(UseBootstrap){
     UseBootstrap <- T
     resBootstrap <- EventPointer_Bootstraps(PSI_boots, Design, Contrast, cores, ram, nbootstraps,
                                             UseBootstrap, Threshold)
@@ -43,18 +38,6 @@ EventPointerStats_BAM <- function(PSI_boots, Design, Contrast, cores=1,
   
   
 }
-# 
-# Dmatrix <- cbind(rep(1,9),
-#                  rep(c(1,0,0),3),
-#                  rep(c(0,1,0),3))
-# #rownames(Dmatrix) <- nameBAM
-# Cmatrix <- cbind(
-#   c(0,1,0),
-#   c(0,0,1))
-# resPrueba
-# EventPointerStats(Events=Events, Design=Design, Contrast=Contrast, cores=1, UseBootstrap=T,
-#                   UseVoom=T, Threshold = 0, lambda = NULL, ram = 0.1,
-#                   nboot = 20, nBootstraps = 1000, pathResult = "./")
 
 voomEventPointerBAM <- function(PSI_boots,Events,Design,Contrast){
   # Compute the abundance as the minimum value of the three paths
@@ -67,7 +50,6 @@ voomEventPointerBAM <- function(PSI_boots,Events,Design,Contrast){
                              function(y) sapply(y, function(x) rowMeans2(x$Counts)[1])))
   averageP2 <- unlist(sapply(Events,
                              function(y) sapply(y, function(x) rowMeans2(x$Counts)[2])))
-
 
   # Remove some values
   dummy <- (rowSds(PSI_boots[,1,],useNames =T )<1e-6)

@@ -1,10 +1,14 @@
 
 #General first step for EventPointer ST workflow
 EventsDetection_ST<- function(PathSamplesAbundance=NULL,
-                              PathTranscriptomeGTF = NULL,EventsTranscriptome=NULL,
-                              PathEventsGTFResults=".",
-                              cores=1, typeAbundance = "kallisto", Bootstrap=T, Filter=F,
-                              Qn = 0.25){
+                              typeAbundance = "kallisto", 
+                              PathTranscriptomeGTF = NULL,
+                              EventsTranscriptome=NULL,
+                              Bootstrap=T,
+                              Filter=F,
+                              Qn = 0.25,
+                              cores=1,
+                              PathEventsGTFResults="."){
 
   #Event detection from transcriptome gtf
   if(!is.null(PathTranscriptomeGTF) & is.null(EventsTranscriptome)){ 
@@ -35,10 +39,16 @@ EventsDetection_ST<- function(PathSamplesAbundance=NULL,
   
 }
 
-EventPointerStats_ST <- function(PSI, Design, Contrast, cores=1, ram=4, 
-                                 BootstrapStats = T,nbootstraps= 10000, 
-                                 UsePseudoAligBootstrap = T,Threshold = 0,
-                                 VoomStats = F, pathResult="./"){
+EventPointerStats_ST <- function(PSI, 
+                                 Design, 
+                                 Contrast, 
+                                 BootstrapStats = T,
+                                 nbootstraps= 10000, 
+                                 UsePseudoAligBootstrap = T,
+                                 Threshold = 0,
+                                 cores=1, 
+                                 ram=4,
+                                 pathResult="./"){
   
   if(is.null(Design)){
     stop("Design field is empty")
@@ -52,19 +62,6 @@ EventPointerStats_ST <- function(PSI, Design, Contrast, cores=1, ram=4,
     if (!file.exists(pathResult)) {
       dir.create(pathResult)
     } 
-    
-    # if(GeneralJunctionStats){
-    #   resTransRef <- EventPointer_RNASeq_TranRef(Count_Matrix=PSI$ExpEvs,
-    #                                              Statistic = "LogFC",
-    #                                              Design,
-    #                                              Contrast)
-    #   pathResultGeneralJunction <- paste0(pathResult, "generalJunctionResult/")
-    #   dir.create(pathResultGeneralJunction)
-    #   for(idContrast in c(1:length(resTransRef))){
-    #     tableRes <- resTransRef[[idContrast]]
-    #     write.csv(tableRes,file = paste0(pathResultGeneralJunction,"ResVoomContrast",idContrast,".csv"))
-    #   }
-    # }
     
     if(BootstrapStats){
       resBootstrap <- EventPointer_Bootstraps(PSI$PSI,
@@ -83,16 +80,6 @@ EventPointerStats_ST <- function(PSI, Design, Contrast, cores=1, ram=4,
       }
     }
     
-    # if(VoomStats){
-    #   resVoom <- voomEventPointerST(PSI,Design, Contrast)
-    #   pathResultVoom <- paste0(pathResult, "voomResult/")
-    #   dir.create(pathResultVoom)
-    #   
-    #   for(idContrast in c(1:length(resVoom))){
-    #     tableRes <- resVoom[[idContrast]]
-    #     write.csv(tableRes,file = paste0(pathResultVoom,"ResVoomContrast",idContrast,".csv"))
-    #   }
-    # }
   }
   
 }
@@ -112,16 +99,6 @@ voomEventPointerST <- function(PSI,Design,Contrast){
                              function(y) colMeans2(y)[2]))
   averageRef <- unlist(lapply(Events,
                               function(y) colMeans2(y)[3]))
-  
-  # abundance <- unlist(sapply(Events,
-  #                            function(y) sapply(y, function(x) min(rowMeans(x$Counts)))))
-  # averageRef <- unlist(sapply(Events,
-  #                             function(y) sapply(y, function(x) rowMeans(x$Counts)[3])))
-  # averageP1 <- unlist(sapply(Events,
-  #                            function(y) sapply(y, function(x) rowMeans(x$Counts)[1])))
-  # averageP2 <- unlist(sapply(Events,
-  #                            function(y) sapply(y, function(x) rowMeans(x$Counts)[2])))
-  
   
   # Remove some values
   dummy <- (rowSds(PSI_boots[,1,],useNames =T)<1e-6)
@@ -145,7 +122,6 @@ voomEventPointerST <- function(PSI,Design,Contrast){
                  I(log2(averageRef)) + I(log2(averageP1)) + I(log2(averageP2)))
   
   overallVar <- predict(modelo)
-  # plot(overallVar, errorSE, pch = 16, col = "#00000001")
   
   overallVar <- 1 + max(overallVar) - overallVar
   

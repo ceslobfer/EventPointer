@@ -7,7 +7,7 @@ PathSamplesAbundance <- "D:/EventPointerBioconductor/EventPointer/inst/extdata/b
 PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
 PathTranscriptomeGTF <- "D:/EventPointer_3.0_replicate/simulation_data/annotation/refseq_hg19.formatted.gtf"
 
-PathSGResult <- "D:/EventPointerToolkit/PruebaPaquete/"
+PathSGResult <- "D:/EventPointer/PruebaPaquete/"
 
 
 BamInfo<-si
