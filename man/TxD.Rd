@@ -3,15 +3,15 @@
 \name{TxD}
 \alias{TxD}
 \title{Transcript x Protein Domain matrix: small matrix for examples}
-\format{
-A \code{matrix} object
+\description{
+Transcript x Protein Domain matrix: small matrix for examples.
 }
 \usage{
 data(TxD)
 }
-\value{
-A matrix containing the relates Transcripts with Protein Domains
+\format{
+A \code{matrix} object.
 }
-\description{
-Transcript x Protein Domain matrix: small matrix for examples
+\value{
+A matrix containing the relates Transcripts with Protein Domains.
 }
