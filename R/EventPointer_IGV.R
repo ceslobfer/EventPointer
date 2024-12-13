@@ -13,12 +13,15 @@
 #' @param PathGTF Directory where to write the GTF files.
 #' @param EventsFile Path to EventsFound.txt file generated with CDFfromGTF function.
 #' @param microarray Microarray used to create the CDF file. Must be one of: HTA-2_0,
-#'                    ClariomD, RTA or MTA
+#'                    ClariomD, RTA or MTA.
 #'
 #' @return The function displays a progress bar to show the user the progress of the function.
 #' Once the progress bar reaches 100%, two .gtf files are written to the specified directory
-#' in PathGTF. The created files are: 1) paths.gtf : GTF file representing the alternative splicing
-#' events and 2) probes.gtf : GTF file representing the probes
+#' in PathGTF. 
+#' The created files are: 
+#' 1) paths.gtf: GTF file representing the alternative splicing
+#' events.
+#' 2) probes.gtf: GTF file representing the probes
 #' that measure each event and each path.
 #'
 #' @examples
@@ -211,26 +214,22 @@ EventPointer_IGV <- function(Events, input,
     
     
     # Read ProbeSets TXT
-    ProbeSets <- read.delim(file = PSR, sep = "\t", 
-        header = TRUE, stringsAsFactors = FALSE)
+    ProbeSets <- read.delim(file = PSR, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
     
     # Arrange the information in the txt file
     # to have the information in the way the
     # algorithm needs it
     
-    ProbeSets <- PrepareProbes(ProbeSets, 
-        "PSR")
+    ProbeSets <- PrepareProbes(ProbeSets, "PSR")
     
     # Read Junctions TXT
-    Junctions <- read.delim(file = Junc, 
-        sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+    Junctions <- read.delim(file = Junc, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
     
     # Arrange the information in the txt file
     # to have the information in the way the
     # algorithm needs it
     
-    Junctions <- PrepareProbes(Junctions, 
-        "Junction")
+    Junctions <- PrepareProbes(Junctions, "Junction")
     
     
     if (input == "Ensembl" | input == "UCSC" | 
@@ -241,9 +240,7 @@ EventPointer_IGV <- function(Events, input,
         seqlevelsStyle(Junc) <- seqlevelsStyle(SplicingGraphFeatures)
         seqlevelsStyle(PSRs) <- seqlevelsStyle(SplicingGraphFeatures)
         
-        
-        Overlap_Junc <- findOverlaps(Junc, 
-            SplicingGraphFeatures)
+        Overlap_Junc <- findOverlaps(Junc, SplicingGraphFeatures)
         
         GeN <- geneName(SplicingGraphFeatures[subjectHits(Overlap_Junc)])
         GeN <- sapply(GeN, function(X) {
@@ -251,15 +248,11 @@ EventPointer_IGV <- function(Events, input,
             return(A)
         })
         
-        GeN_iix <- cbind(queryHits(Overlap_Junc), 
-            GeN)
+        GeN_iix <- cbind(queryHits(Overlap_Junc), GeN)
         GeN_iix <- unique(GeN_iix)
-        Junctions[as.numeric(GeN_iix[, 1]), 
-            "Gene"] <- GeN_iix[, 2]
+        Junctions[as.numeric(GeN_iix[, 1]), "Gene"] <- GeN_iix[, 2]
         
-        
-        Overlap_PSR <- findOverlaps(PSRs, 
-            SplicingGraphFeatures)
+        Overlap_PSR <- findOverlaps(PSRs, SplicingGraphFeatures)
         
         GeN <- geneName(SplicingGraphFeatures[subjectHits(Overlap_PSR)])
         GeN <- sapply(GeN, function(X) {
@@ -267,11 +260,9 @@ EventPointer_IGV <- function(Events, input,
             return(A)
         })
         
-        GeN_iix <- cbind(queryHits(Overlap_PSR), 
-            GeN)
+        GeN_iix <- cbind(queryHits(Overlap_PSR), GeN)
         GeN_iix <- unique(GeN_iix)
-        ProbeSets[as.numeric(GeN_iix[, 1]), 
-            "Gene"] <- GeN_iix[, 2]
+        ProbeSets[as.numeric(GeN_iix[, 1]), "Gene"] <- GeN_iix[, 2]
     }
     
     cat("Done")
@@ -289,9 +280,7 @@ EventPointer_IGV <- function(Events, input,
     GeneIndex <- cbind(Genes, geneIds)
     
     # Get Genes with Junctions and PSR probes
-    KeptGenes <- intersect(GeneIndex[, 1], 
-        intersect(Junctions[, "Gene"], ProbeSets[, 
-            "Gene"]))
+    KeptGenes <- intersect(GeneIndex[, 1], intersect(Junctions[, "Gene"], ProbeSets[, "Gene"]))
     
     iix <- match(KeptGenes, GeneIndex[, 1])
     GeneIndex <- GeneIndex[iix, , drop = FALSE]
@@ -307,42 +296,27 @@ EventPointer_IGV <- function(Events, input,
     Ord <- order(KeptGenes)
     GeneIndex <- GeneIndex[Ord, , drop = FALSE]
     KeptGenes <- KeptGenes[Ord]
-    ProbeSets <- ProbeSets[order(ProbeSets[, 
-        "Gene"]), ]
-    Junctions <- Junctions[order(Junctions[, 
-        "Gene"]), ]
+    ProbeSets <- ProbeSets[order(ProbeSets[, "Gene"]), ]
+    Junctions <- Junctions[order(Junctions[, "Gene"]), ]
     
     Junc_rle <- rle(Junctions[, "Gene"])
     PS_rle <- rle(ProbeSets[, "Gene"])
     
     indexE_Junc <- cumsum(Junc_rle$lengths)
-    indexS_Junc <- c(1, indexE_Junc[seq_len((length(indexE_Junc) - 
-        1))] + 1)
+    indexS_Junc <- c(1, indexE_Junc[seq_len((length(indexE_Junc) - 1))] + 1)
     
     indexE_PS <- cumsum(PS_rle$lengths)
-    indexS_PS <- c(1, indexE_PS[seq_len((length(indexE_PS) - 
-        1))] + 1)
+    indexS_PS <- c(1, indexE_PS[seq_len((length(indexE_PS) - 1))] + 1)
     
-    EventsInfo <- read.delim(file = paste(EventsFile, 
-        sep = ""), sep = "\t", header = TRUE)
-    rownames(EventsInfo) <- paste(EventsInfo[, 
-        1], "_", EventsInfo[, 3], sep = "")
+    EventsInfo <- read.delim(file = paste(EventsFile, sep = ""), sep = "\t", header = TRUE)
+    rownames(EventsInfo) <- paste(EventsInfo[, 1], "_", EventsInfo[, 3], sep = "")
     
     iix <- match(rownames(Events), rownames(EventsInfo))
     EventsInfo <- EventsInfo[iix, , drop = FALSE]
     
-    # iix <-
-    # match(matrix(unlist(strsplit(rownames(Events),
-    # '_')), ncol = 2, byrow = TRUE)[, 1],
-    # GeneIndex[, 1])
+    Idmat <- matrix(unlist(strsplit(rownames(Events), "_")), ncol = 2, byrow = TRUE)
     
-    Idmat <- matrix(unlist(strsplit(rownames(Events), 
-        "_")), ncol = 2, byrow = TRUE)
-    # EvNum<-sapply(EvId,tail,1)
-    # Idmat<-cbind(EvId[,1],EvNum)
-    
-    iix <- match(Idmat[, 1], GeneIndex[, 
-        1])
+    iix <- match(Idmat[, 1], GeneIndex[, 1])
     
     GeneIndex <- GeneIndex[iix, , drop = FALSE]
     
@@ -356,86 +330,54 @@ EventPointer_IGV <- function(Events, input,
     
     cat("Done")
     
-    # Create file to store gtf for patths
+    # Create file to store gtf for paths
     # (events)
-    FILE.paths <- paste(PathGTF, "/paths.gtf", 
-        sep = "")
-    cat(file = FILE.paths, paste("#track name=", 
-        shQuote("paths", type = "cmd"), " gffTags=", 
-        shQuote("on", type = "cmd"), sep = ""), 
-        "\n")
+    FILE.paths <- paste(PathGTF, "/paths.gtf", sep = "")
+    cat(file = FILE.paths, paste("#track name=", shQuote("paths", type = "cmd"), " gffTags=", shQuote("on", type = "cmd"), sep = ""), "\n")
     
     # Create file to store gtf for probes
     # (events)
-    FILE.paths <- paste(PathGTF, "/probes.gtf", 
-        sep = "")
-    cat(file = FILE.paths, paste("#track name=", 
-        shQuote("probes", type = "cmd"), 
-        " gffTags=", shQuote("on", type = "cmd"), 
-        sep = ""), "\n")
+    FILE.paths <- paste(PathGTF, "/probes.gtf", sep = "")
+    cat(file = FILE.paths, paste("#track name=", shQuote("probes", type = "cmd"), " gffTags=", shQuote("on", type = "cmd"), sep = ""), "\n")
     
     cat("\n Generating GTF Files...")
     
-    pb <- txtProgressBar(min = 0, max = nrow(Events), 
-        style = 3)
+    pb <- txtProgressBar(min = 0, max = nrow(Events), style = 3)
     
     for (jj in seq_len(nrow(GeneIndex))) {
         setTxtProgressBar(pb, jj)
         
         Gene <- GeneIndex[jj, 1]
         
-        SG_Gene <- SplicingGraphFeatures[unlist(geneID(SplicingGraphFeatures)) == 
-            GeneIndex[jj, 2]]
-        
-        #SG_Edges <- SG_Info(SG_Gene)$Edges
+        SG_Gene <- SplicingGraphFeatures[unlist(geneID(SplicingGraphFeatures)) == GeneIndex[jj, 2]]
         SG_Edges <- SG_creation_RNASeq(SG_Gene)$Edges
         
         if (SG_Edges[1, "Strand"] == "") {
-            SG_Edges[, 6] <- gsub("", "-", 
-                SG_Edges[, 6])
+            SG_Edges[, 6] <- gsub("", "-", SG_Edges[, 6])
         }
         
-       
-        EventPaths <- GetIGVPaths(EventsInfo[jj, 
-            ], SG_Edges)
+        EventPaths <- GetIGVPaths(EventsInfo[jj, ], SG_Edges)
+        JnProbes <- Junctions[indexS_Junc[jj]:indexE_Junc[jj], ]
+        JnProbes[, "Start"] <- round((as.numeric(JnProbes[, "Start"]) + as.numeric(JnProbes[, "Stop"]))/2)
         
-        JnProbes <- Junctions[indexS_Junc[jj]:indexE_Junc[jj], 
-            ]
-        JnProbes[, "Start"] <- round((as.numeric(JnProbes[, 
-            "Start"]) + as.numeric(JnProbes[, 
-            "Stop"]))/2)
+        EventProbes <- rbind(ProbeSets[indexS_PS[jj]:indexE_PS[jj], ], JnProbes)
         
-        EventProbes <- rbind(ProbeSets[indexS_PS[jj]:indexE_PS[jj], 
-            ], JnProbes)
-        
-        xProbe.P1 <- as.numeric(unlist(strsplit(as.vector(EventsInfo[jj, 
-            "Probes.P1"]), ",")))
-        ii.P1 <- match(xProbe.P1, EventProbes[, 
-            1])
-        xProbe.P2 <- as.numeric(unlist(strsplit(as.vector(EventsInfo[jj, 
-            "Probes.P2"]), ",")))
-        ii.P2 <- match(xProbe.P2, EventProbes[, 
-            1])
-        xProbe.R <- as.numeric(unlist(strsplit(as.vector(EventsInfo[jj, 
-            "Probes.Ref"]), ",")))
-        ii.PR <- match(xProbe.R, EventProbes[, 
-            1])
-        IDs <- c(rep("Path1", length(xProbe.P1)), 
-            rep("Path2", length(xProbe.P2)), 
-            rep("Ref", length(xProbe.R)))
+        xProbe.P1 <- as.numeric(unlist(strsplit(as.vector(EventsInfo[jj, "Probes.P1"]), ",")))
+        ii.P1 <- match(xProbe.P1, EventProbes[, 1])
+        xProbe.P2 <- as.numeric(unlist(strsplit(as.vector(EventsInfo[jj, "Probes.P2"]), ",")))
+        ii.P2 <- match(xProbe.P2, EventProbes[, 1])
+        xProbe.R <- as.numeric(unlist(strsplit(as.vector(EventsInfo[jj, "Probes.Ref"]), ",")))
+        ii.PR <- match(xProbe.R, EventProbes[, 1])
+        IDs <- c(rep("Path1", length(xProbe.P1)),
+                 rep("Path2", length(xProbe.P2)), 
+                 rep("Ref", length(xProbe.R)))
         Wds <- rep(25, length(IDs))
-        EventProbes <- cbind(EventProbes[c(ii.P1, 
-            ii.P2, ii.PR), c(1, 5, 6)], Wds, 
-            EventProbes[c(ii.P1, ii.P2, ii.PR), 
-                8], IDs)
-        colnames(EventProbes) <- c("names", 
-            "chromosome", "start", "width", 
-            "strand", "Path")
+        EventProbes <- cbind(EventProbes[c(ii.P1,ii.P2, ii.PR), c(1, 5, 6)], Wds, EventProbes[c(ii.P1, ii.P2, ii.PR), 8], IDs)
+        colnames(EventProbes) <- c("names", "chromosome", "start", "width", "strand", "Path")
         
         class(EventPaths[, 2]) <- "integer"
         class(EventPaths[, 3]) <- "integer"
-        WriteGTF(PathGTF, EventsInfo[jj, 
-            ], EventProbes, EventPaths)
+        WriteGTF(PathGTF, EventsInfo[jj,], EventProbes, EventPaths)
     }
     
     close(pb)

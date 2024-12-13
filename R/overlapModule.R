@@ -29,23 +29,17 @@ junctionCompatible <- function(junctions, frag_exonic, frag_intron,
 
 filterIntrons <- function(frag_intron, frag_exonic, min_anchor)
 {
-  
   unlisted_intron <- unlist(frag_intron)
   
   f_L <- as(flank(unlisted_intron, min_anchor, TRUE), "IRangesList")
-  #save(f_L,file="f_L.RData")
-  #save(frag_exonic[togroup0(frag_intron)],file="second_intersect.RData")
   f_L <- intersect(f_L, frag_exonic[togroup0(frag_intron)])
   w_L <- sum(width(f_L))
-  
-  #save(f_L,file="f_L.RData")
   f_R <- as(flank(unlisted_intron, min_anchor, FALSE), "IRangesList")
   f_R <- intersect(f_R, frag_exonic[togroup0(frag_intron)])
   w_R <- sum(width(f_R))
   i <- which(w_L == min_anchor & w_R == min_anchor)
   
-  filtered <- setNames(split(unlisted_intron[i],
-                             factor(togroup0(frag_intron)[i], seq_along(frag_intron))), NULL)
+  filtered <- setNames(split(unlisted_intron[i],factor(togroup0(frag_intron)[i], seq_along(frag_intron))), NULL)
   rm(frag_exonic)
   rm(frag_intron)
   gc(full=TRUE)
@@ -96,10 +90,7 @@ dimMatrixFix <- function(matrix1, matrix2){
 ##' @keywords internal
 ##' @author Leonard Goldstein
 
-splicesiteOverlap <- function(splicesites, side, frag_exonic, frag_intron,
-                              min_anchor, include = c("all", "spliced", "unspliced"), counts = TRUE)
-{
-  
+splicesiteOverlap <- function(splicesites, side, frag_exonic, frag_intron,min_anchor, include = c("all", "spliced", "unspliced"), counts = TRUE){
   
   include <- match.arg(include)
   
@@ -124,10 +115,8 @@ splicesiteOverlap <- function(splicesites, side, frag_exonic, frag_intron,
     rm(tmp)
     qH <- queryHits(hits_unspliced)
     sH <- subjectHits(hits_unspliced)
-    intron_anchor <- as(flank(splicesites, min_anchor, start = start),
-                        "IRangesList")
-    exonic_anchor <- as(flank(splicesites, -min_anchor, start = start),
-                        "IRangesList")
+    intron_anchor <- as(flank(splicesites, min_anchor, start = start),"IRangesList")
+    exonic_anchor <- as(flank(splicesites, -min_anchor, start = start),"IRangesList")
     w_E <- sum(width(intersect(exonic_anchor[qH], frag_exonic[sH])))
     w_I <- sum(width(intersect(intron_anchor[qH], frag_exonic[sH])))
     hits_unspliced <- hits_unspliced[w_E == min_anchor & w_I == min_anchor]
@@ -135,16 +124,13 @@ splicesiteOverlap <- function(splicesites, side, frag_exonic, frag_intron,
   }
   
   if (include == "spliced") {
-    
     hits <- hits_spliced
     rm(hits_spliced)
   } else if (include == "unspliced") {
-    
     hits <- hits_unspliced
     rm(hits_unspliced)
     rm()
   } else if (include == "all") {
-    
     hits <- union(hits_spliced, hits_unspliced)
     rm(hits_spliced)
     rm(hits_unspliced)
@@ -158,7 +144,6 @@ splicesiteOverlap <- function(splicesites, side, frag_exonic, frag_intron,
   
   if (counts) elementNROWS(splicesite_index)
   else splicesite_index
-  
 }
 
 ##' Modified \code{findOverlaps} function for \code{IRanges},
@@ -176,17 +161,11 @@ splicesiteOverlap <- function(splicesites, side, frag_exonic, frag_intron,
 ##' 
 ##' 
 
-exonCompatible<- function(exons, spliceL, spliceR, frag_exonic,
-                          frag_intron, counts = TRUE){
+exonCompatible<- function(exons, spliceL, spliceR, frag_exonic,frag_intron, counts = TRUE){
   
   if (length(spliceL) == 1) spliceL <- rep(spliceL, length(exons))
   if (length(spliceR) == 1) spliceR <- rep(spliceR, length(exons))
   res<- c()
-  # save(exons, file = "exons.RData")
-  # save(spliceL, file = "spliceL.RData")
-  # save(spliceR, file = "spliceR.RData")
-  # save(frag_exonic, file = "frag_exonic.RData")
-  # save(frag_intron, file = "frag_intron.RData")
   
   lenSubject <- length(frag_exonic)
   lenQuery <- length(exons)
@@ -199,26 +178,20 @@ exonCompatible<- function(exons, spliceL, spliceR, frag_exonic,
   df <- cbind(start(subject_unlisted), end(subject_unlisted))
   options(digits=12)
   uniqueVector <- as.vector(matrix(df, ncol = 2) %*% matrix(rnorm(2),nrow = 2))
-  
-  # source_python("uniqueVectorIndex.py")
-  # posiciones_repetidas <- indexVector(uniqueVector)
+ 
   posiciones_repetidas <- split(seq_along(uniqueVector), uniqueVector)[as.character(unique(uniqueVector))]
-  
   
   new_subject_unlist <- df[!duplicated(uniqueVector),]
   rm(df)
   rm(uniqueVector)
   if (length(nrow(new_subject_unlist)) == 0){
     if (length(new_subject_unlist) == 2) {
-      new_subject_unlist <- IRanges(start = new_subject_unlist[1],
-                                    end = new_subject_unlist[2])
+      new_subject_unlist <- IRanges(start = new_subject_unlist[1],end = new_subject_unlist[2])
     }else{
-      new_subject_unlist <- IRanges(start = NULL,
-                                    end = NULL)
+      new_subject_unlist <- IRanges(start = NULL,end = NULL)
     }
   }else{
-    new_subject_unlist <- IRanges(start = new_subject_unlist[,1],
-                                  end = new_subject_unlist[,2])
+    new_subject_unlist <- IRanges(start = new_subject_unlist[,1],end = new_subject_unlist[,2])
   }
   
   hits_exonic <- list()
@@ -251,7 +224,6 @@ exonCompatible<- function(exons, spliceL, spliceR, frag_exonic,
   if (counts){
     res <- lapply(seq_along(excl1),function(i){
       eraseGroup <- c(hits_introns[[i]],excl1[[i]],excl2[[i]])
-      
       lgroup <- length(setdiff(subject_togroup[unlist(posiciones_repetidas[hits_exonic[[i]]])],eraseGroup))
       if(i%%10000 == 0){
         excl1[c(lastErase:i)] <<- 0L
@@ -296,123 +268,7 @@ exonCompatible<- function(exons, spliceL, spliceR, frag_exonic,
   
   return(res)
 }
-# exonCompatible<- function(exons, spliceL, spliceR, frag_exonic,
-#                           frag_intron, counts = TRUE){
-#   
-#   if (length(spliceL) == 1) spliceL <- rep(spliceL, length(exons))
-#   if (length(spliceR) == 1) spliceR <- rep(spliceR, length(exons))
-#   res<- c()
-#   # save(exons, file = "exons.RData")
-#   # save(spliceL, file = "spliceL.RData")
-#   # save(spliceR, file = "spliceR.RData")
-#   # save(frag_exonic, file = "frag_exonic.RData")
-#   # save(frag_intron, file = "frag_intron.RData")
-#   
-#   lenSubject <- length(frag_exonic)
-#   lenQuery <- length(exons)
-#   
-#   subject_unlisted <- unlist(frag_exonic)
-#   subject_togroup <- togroup0(frag_exonic)
-#   query_unlisted <- exons
-#   query_togroup <- seq_along(exons)
-#   
-#   df <- cbind(start(subject_unlisted), end(subject_unlisted))
-#   options(digits=12)
-#   uniqueVector <- as.vector(matrix(df, ncol = 2) %*% matrix(rnorm(2),nrow = 2))
-#   
-#   library(data.table)
-#   table_subject <- data.table::as.data.table(uniqueVector)[,list(list(.I)),by = uniqueVector]
-#   new_subject_unlist <- df[!duplicated(uniqueVector),]
-#   rm(df)
-#   rm(uniqueVector)
-#   if (length(nrow(new_subject_unlist)) == 0){
-#     if (length(new_subject_unlist) == 2) {
-#       new_subject_unlist <- IRanges(start = new_subject_unlist[1], 
-#                                     end = new_subject_unlist[2])
-#     }else{
-#       new_subject_unlist <- IRanges(start = NULL, 
-#                                     end = NULL)
-#     } 
-#   }else{
-#     new_subject_unlist <- IRanges(start = new_subject_unlist[,1], 
-#                                   end = new_subject_unlist[,2])
-#   }
-#   
-#   hits_exonic <- list()
-#   positionsVector <- split(c(1:lenQuery), ceiling(seq_along(query_unlisted)/3000))
-#   for(val in c(1:length(positionsVector))){
-#     pos <- positionsVector[val]
-#     hits_listed <- as.list(findOverlaps(query_unlisted[unlist(pos)], new_subject_unlist, type = "any"))
-#     if (length(hits_listed) == 0) {
-#       hits_exonic <- hits_listed
-#       rm(hits_listed)
-#     }else{
-#       hits_exonic <- c(hits_exonic,hits_listed)
-#       rm(hits_listed)  
-#     }
-#     if(val%%10 == 0){
-#       gc()
-#     }
-#   }
-#   
-#   gc()
-#   
-#   hits_introns <- findOverlapsRanges(exons, frag_intron)
-#   
-#   excl1 <- findOverlapsRanges(flank(exons, 1, TRUE), frag_exonic)
-#   excl1[which(!spliceL)] <- 0L
-#   
-#   excl2 <- findOverlapsRanges(flank(exons, 1, FALSE), frag_exonic)
-#   excl2[which(!spliceR)] <- 0L
-#   lastErase <- 1
-#   if (counts){
-#     res <- lapply(seq_along(excl1),function(i){
-#       eraseGroup <- c(hits_introns[[i]],excl1[[i]],excl2[[i]])
-#       
-#       lgroup <- length(setdiff(subject_togroup[unlist(table_subject$V1[hits_exonic[[i]]])],eraseGroup))
-#       if(i%%10000 == 0){
-#         excl1[c(lastErase:i)] <<- 0L
-#         excl2[c(lastErase:i)] <<- 0L
-#         hits_introns[c(lastErase:i)] <<- 0L
-#         lastErase <- i
-#         gc()
-#       }
-#       
-#       return(lgroup)
-#     })
-#     
-#   }else{
-#     res <- lapply(seq_along(excl1),function(i){
-#       eraseGroup <- c(hits_introns[[i]],excl1[[i]],excl2[[i]])
-#       lgroup <- setdiff(subject_togroup[unlist(table_subject$V1[hits_exonic[[i]]])],eraseGroup)
-#       res <- c(res, list(lgroup))
-#       if(i != 1 & i%%10000 == 0){
-#         excl1[c(lastErase:i)] <<- 0L
-#         excl2[c(lastErase:i)] <<- 0L
-#         hits_introns[c(lastErase:i)] <<- 0L
-#         lastErase <<- i
-#         gc()
-#       }
-#       return(lgroup)
-#     })
-#     
-#   }
-#   
-#   rm(excl1)
-#   rm(excl2)
-#   rm(hits_introns)
-#   gc()
-#   
-#   rm(new_subject_unlist)
-#   rm(subject_togroup)
-#   rm(query_unlisted)
-#   rm(subject_unlisted)
-#   rm(table_subject)
-#   
-#   gc()
-#   
-#   return(res)
-# }
+
 findOverlapsRanges <- function(query, subject, type = "any", out = "list")
 {
   
@@ -424,18 +280,14 @@ findOverlapsRanges <- function(query, subject, type = "any", out = "list")
   if (is(query, "IRangesList")) {
     query_unlisted <- unlist(query)
     query_togroup <- togroup0(query)
-    
   }else {
     query_unlisted <- query
     query_togroup <- seq_along(query)
-    
   }
-  
   if (is(subject, "IRangesList")) {
     subject_unlisted <- unlist(subject)
     subject_togroup <- togroup0(subject)
     rm(subject)
-    
   }else {
     subject_unlisted <- subject
     subject_togroup <- seq_along(subject)
@@ -464,15 +316,12 @@ findOverlapsRanges <- function(query, subject, type = "any", out = "list")
     rm(hits_unlisted)
     gc(full=TRUE)
     
-    hits <- Hits(as.integer(hits[, 1]), as.integer(hits[, 2]),
-                 lenQuery, lenSubject, sort.by.query = TRUE)
+    hits <- Hits(as.integer(hits[, 1]), as.integer(hits[, 2]),lenQuery, lenSubject, sort.by.query = TRUE)
     
   }else {
     if (!is(query, "IRangesList")) {
-      hits <- modFindOverlap(query_unlisted,subject_unlisted,subject_togroup,
-                             lenQuery, lenSubject, out)
+      hits <- modFindOverlap(query_unlisted,subject_unlisted,subject_togroup,lenQuery, lenSubject, out)
     }else{
-      # print("Que esta pasando aski")
       hits_unlisted <- findOverlaps(query_unlisted, subject_unlisted, type = "any")
       subject_hits <- subjectHits(hits_unlisted)
       query_hits <- queryHits(hits_unlisted)
@@ -492,14 +341,10 @@ findOverlapsRanges <- function(query, subject, type = "any", out = "list")
       rm(hits_unlisted)
       gc(full=TRUE)
       
-      hits <- Hits(as.integer(hits[, 1]), as.integer(hits[, 2]),
-                   lenQuery, lenSubject, sort.by.query = TRUE)
+      hits <- Hits(as.integer(hits[, 1]), as.integer(hits[, 2]),lenQuery, lenSubject, sort.by.query = TRUE)
     }
-    
   }
-  
   return(hits)
-  
 }
 
 modFindOverlap <- function(query_unlisted,subject_unlisted,subject_togroup,lenQuery, lenSubject, out){
@@ -508,22 +353,18 @@ modFindOverlap <- function(query_unlisted,subject_unlisted,subject_togroup,lenQu
   df <- cbind(start(subject_unlisted), end(subject_unlisted))
   options(digits=12)
   uniqueVector <- as.vector(matrix(df, ncol = 2) %*% matrix(rnorm(2),nrow = 2))
-  # table_subject <- data.table::as.data.table(uniqueVector)[,list(list(.I)), by = uniqueVector]
   posiciones_repetidas <- split(seq_along(uniqueVector), uniqueVector)[as.character(unique(uniqueVector))]
   new_subject_unlist <- df[!duplicated(uniqueVector),]
   rm(df)
   rm(uniqueVector)
   if (length(nrow(new_subject_unlist)) == 0){
     if (length(new_subject_unlist) == 2) {
-      new_subject_unlist <- IRanges(start = new_subject_unlist[1], 
-                                    end = new_subject_unlist[2])
+      new_subject_unlist <- IRanges(start = new_subject_unlist[1], end = new_subject_unlist[2])
     }else{
-      new_subject_unlist <- IRanges(start = NULL, 
-                                    end = NULL)
+      new_subject_unlist <- IRanges(start = NULL, end = NULL)
     } 
   }else{
-    new_subject_unlist <- IRanges(start = new_subject_unlist[,1], 
-                                  end = new_subject_unlist[,2])
+    new_subject_unlist <- IRanges(start = new_subject_unlist[,1], end = new_subject_unlist[,2])
   }
   
   hits_listed_res <- list()
@@ -548,17 +389,13 @@ modFindOverlap <- function(query_unlisted,subject_unlisted,subject_togroup,lenQu
   rm(posiciones_repetidas)
   gc()
   if (out != "list") {
-    hits_listed_res <- Hits(rep(c(1:length(query_unlisted)),lengths(hits_listed_res)),unlist(hits_listed_res),
-                            lenQuery, lenSubject, sort.by.query = FALSE)
+    hits_listed_res <- Hits(rep(c(1:length(query_unlisted)),lengths(hits_listed_res)),unlist(hits_listed_res),lenQuery, lenSubject, sort.by.query = FALSE)
   }
-  
   
   rm(new_subject_unlist)
   rm(subject_togroup)
-  # rm(hits_listed_res)
   rm(query_unlisted)
   rm(subject_unlisted)
-  
   
   gc()
   return(hits_listed_res)

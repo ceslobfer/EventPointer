@@ -30,9 +30,6 @@ EventPointerStats_BAM <- function(PSI_boots,
       tableRes <- ResulTable(resBootstrap, coef = coef)
       write.csv(tableRes,file = paste0(pathResultBootstrap,"ResBootstrapContrast",coef,".csv"))
     }
-      
-
-    # }
 
   }
   
@@ -73,7 +70,6 @@ voomEventPointerBAM <- function(PSI_boots,Events,Design,Contrast){
                  I(log2(averageRef)) + I(log2(averageP1)) + I(log2(averageP2)))
 
   overallVar <- predict(modelo)
-  # plot(overallVar, errorSE, pch = 16, col = "#00000001")
 
   overallVar <- 1 + max(overallVar) - overallVar
 
@@ -107,16 +103,14 @@ voom2 <- function (counts, design = NULL, lib.size = NULL, normalize.method = "n
   if (is(counts, "DGEList")) {
     out$genes <- counts$genes
     out$targets <- counts$samples
-    if (is.null(design) && diff(range(as.numeric(counts$sample$group))) >
-        0)
+    if (is.null(design) && diff(range(as.numeric(counts$sample$group))) >0)
       design <- model.matrix(~group, data = counts$samples)
     if (is.null(lib.size))
       lib.size <- counts$samples$lib.size * counts$samples$norm.factors
     counts <- counts$counts
   }
   else {
-    isExpressionSet <- suppressPackageStartupMessages(is(counts,
-                                                         "ExpressionSet"))
+    isExpressionSet <- suppressPackageStartupMessages(is(counts,"ExpressionSet"))
     if (isExpressionSet) {
       if (length(Biobase::fData(counts)))
         out$genes <- Biobase::fData(counts)

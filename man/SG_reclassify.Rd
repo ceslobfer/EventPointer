@@ -3,18 +3,15 @@
 \name{SG_reclassify}
 \alias{SG_reclassify}
 \title{Splicing graph example for Events_ReClassification function}
-\format{
-A \code{list} object \code{SG_reclassify[[i]]}
-displays the  splicing graph of the ith gene.
+\description{
+Splicing graph example for Events_ReClassification function
 }
 \usage{
 data(SG_reclassify)
 }
-\value{
-A list with the splicing graph of the 5 genes corresponding
-to the alternative splicing events depicted in the example of the 
-function Events_ReClassification.
+\format{
+A \code{list} object \code{SG_reclassify[[i]]} displays the  splicing graph of the ith gene.
 }
-\description{
-Splicing graph example for Events_ReClassification function
+\value{
+A list with the splicing graph of the 5 genes corresponding to the alternative splicing events depicted in the example of the  function \code{Events_ReClassification}.
 }

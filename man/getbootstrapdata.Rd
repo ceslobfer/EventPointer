@@ -3,6 +3,9 @@
 \name{getbootstrapdata}
 \alias{getbootstrapdata}
 \title{getbootstrapdata}
+\description{
+Function to load the values of the bootstrap returned by kallisto or salmon pseudoaligners.
+}
 \usage{
 getbootstrapdata(PathSamples, type)
 }
@@ -14,16 +17,10 @@ getbootstrapdata(PathSamples, type)
 \value{
 A list containing the quantification data with the bootstrap information.
 }
-\description{
-Function to load the values of the bootstrap returned by kallisto or salmon pseudoaligners.
-}
 \examples{
-
        PathSamples<-system.file("extdata",package="EventPointer")
        PathSamples <- paste0(PathSamples,"/output")
        PathSamples <- dir(PathSamples,full.names = TRUE)
        
        data_exp <- getbootstrapdata(PathSamples = PathSamples,type = "kallisto")
-
-
 }

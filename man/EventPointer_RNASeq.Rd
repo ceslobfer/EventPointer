@@ -3,11 +3,14 @@
 \name{EventPointer_RNASeq}
 \alias{EventPointer_RNASeq}
 \title{Statistical analysis of alternative splcing events for RNASeq data}
+\description{
+Statistical analysis of all the alternative splicing events found in the given bam files.
+}
 \usage{
 EventPointer_RNASeq(Events, Design, Contrast, Statistic = "LogFC", PSI = FALSE)
 }
 \arguments{
-\item{Events}{Output from EventDetection function}
+\item{Events}{Output from \code{EventDetection} function}
 
 \item{Design}{The design matrix for the experiment.}
 
@@ -21,13 +24,12 @@ EventPointer_RNASeq(Events, Design, Contrast, Statistic = "LogFC", PSI = FALSE)
 Data.frame ordered by the splicing p.value . The object contains the different information for each splicing event
 such as Gene name, event type, genomic position, p.value, z.value and delta PSI.
 }
-\description{
-Statistical analysis of all the alternative splicing events found in the given bam files.
-}
 \examples{
+  \dontrun{
 
    data(AllEvents_RNASeq)
    Dmatrix<-matrix(c(1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1),ncol=2,byrow=FALSE)
    Cmatrix<-t(t(c(0,1)))
    Events <- EventPointer_RNASeq(AllEvents_RNASeq,Dmatrix,Cmatrix,Statistic='LogFC',PSI=TRUE)
+}
 }

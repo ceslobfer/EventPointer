@@ -3,29 +3,27 @@
 \name{ResulTable}
 \alias{ResulTable}
 \title{ResulTable}
+\description{
+Extract a table of the top-ranked events from the output of \code{EventPointer_Bootstraps}.
+}
 \usage{
 ResulTable(EP_Result,coef = 1,number = Inf)
 }
 \arguments{
-\item{EP_Result}{The output of the function EventPointer_Bootstraps}
+\item{EP_Result}{The output of the function EventPointer_Bootstraps.}
 
 \item{coef}{Number specifying which coefficient or contrast of the model is of interest.}
 
-\item{number}{Maximum number of events to list}
+\item{number}{Maximum number of events to list.}
 }
 \value{
 A dataframe with a row for the number of top events and the following columns:
-
-deltaPSI: the difference of PSI between conditions
-
-pvalue: raw p-value
-
-lfdr: local false discovery rate
-
-qvalue: adjusted p-value or q-value
+\itemize{
+  \item \code{deltaPSI}: The difference of PSI between conditions.
+  \item \code{pvalue}: Raw p-value
+  \item \code{lfdr}: Local false discovery rate.
+  \item \code{qvalue}: Adjusted p-value or q-value
 }
-\description{
-Extract a table of the top-ranked events from the output of EventPointer_Bootstraps.
 }
 \examples{
 

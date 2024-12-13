@@ -3,6 +3,9 @@
 \name{GetPSI_FromTranRef}
 \alias{GetPSI_FromTranRef}
 \title{GetPSI_FromTranRef}
+\description{
+Get the values of PSI. A filer expression is applied if the user select the option of filter.
+}
 \usage{
 GetPSI_FromTranRef(
   Samples,
@@ -13,24 +16,18 @@ GetPSI_FromTranRef(
 )
 }
 \arguments{
-\item{Samples}{matrix or list containing the expression of the samples.}
+\item{Samples}{Matrix or list containing the expression of the samples.}
 
-\item{PathsxTranscript}{the output of EventDetection_transcriptome.}
+\item{PathsxTranscript}{The output of \code{EventDetection_transcriptome}.}
 
 \item{Bootstrap}{Boolean variable to indicate if bootstrap data from pseudo-alignment is used.}
 
-\item{Filter}{Boolean variable to indicate if an expression filter is applied. Default TRUE.}
+\item{Filter}{Boolean variable to indicate if an expression filter is applied. Default value is TRUE.}
 
 \item{Qn}{Quartile used to filter the events (Bounded between 0-1, Qn would be 0.25 by default).}
 }
 \value{
-The output is a list containing two elements: a matrix with the
-values of PSI  and a list containing as many matrices as number of events.
-In each matrix is stored the expression of the different paths of an event along the samples.
-}
-\description{
-Get the values of PSI. A filer expression is applied if
-the user select the option of filter.
+The output is a list containing two elements: a matrix with the values of PSI  and a list containing as many matrices as number of events. In each matrix is stored the expression of the different paths of an event along the samples.
 }
 \examples{
      data(EventXtrans)

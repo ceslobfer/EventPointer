@@ -42,10 +42,6 @@ GetPSI_FromTranRef <- function(Samples,
                                Filter = TRUE,
                                Qn = 0.25){
   
-  
-  
-  
-  
   if (is.null(PathsxTranscript)) {
     stop("PathsxTranscript field is empty")
   }
@@ -55,19 +51,15 @@ GetPSI_FromTranRef <- function(Samples,
   
   ## check annotation of expression data and eventsxtranscripts can merge
   
-  
-  
   if(Bootstrap==FALSE){
     trannames_gtf <- PathsxTranscript$transcritnames
     trannames_Samples <- rownames(Samples)
-    
     
     if (length(trannames_Samples) != length(trannames_gtf)) {
       warning("\nNot the same number of Transcripts in GTF and Fasta used...\n")
     }
     
-    if (any(trannames_Samples %in% trannames_gtf == 
-            FALSE)) {
+    if (any(trannames_Samples %in% trannames_gtf == FALSE)) {
       cat("\nRemoving transcripts from Samples data...")
       trannames_Samples <- trannames_Samples[trannames_Samples %in% trannames_gtf]
       if(length(trannames_Samples) == 0){
@@ -75,18 +67,13 @@ GetPSI_FromTranRef <- function(Samples,
       }
     }
     
-    
-    if (any(trannames_gtf %in% trannames_Samples == 
-            FALSE)) {
+    if (any(trannames_gtf %in% trannames_Samples == FALSE)) {
       cat("\nRemoving Events that include transcripts not annotated in Samples data...\n")
       trannames_gtf <- trannames_gtf[trannames_gtf %in% trannames_Samples]
       if(length(trannames_gtf)==0){
         stop("\nNo match between Samples and Events annotation\n")
       }
-      
-      
     }
-    
     
     Samples <- Samples[trannames_Samples,]
     jjx <- which(PathsxTranscript$transcritnames %in% trannames_gtf)
@@ -94,15 +81,11 @@ GetPSI_FromTranRef <- function(Samples,
     Path2 <- PathsxTranscript$ExTP2[,jjx]
     PathRef <- PathsxTranscript$ExTPRef[,jjx]
     
-    
-    
     if (!identical(trannames_gtf, trannames_Samples)) {
       iix <- match(trannames_gtf, trannames_Samples)
       Samples <- Samples[iix, ]
     }
-    # identical(rownames(Samples), trannames_gtf)
-    
-    # length(which(Matrix::rowSums(PathsxTranscript$ExTPRef)==0))
+
     rrx <- which(Matrix::rowSums(PathRef)==0)
     if(length(rrx)>0){
       Path1 <- Path1[-rrx,]
@@ -110,13 +93,9 @@ GetPSI_FromTranRef <- function(Samples,
       PathRef <- PathRef[-rrx,]
     }
     
-    ConcentrationPath1 <- as.matrix(Path1 %*% 
-                                      Samples)
-    ConcentrationPath2 <- as.matrix(Path2 %*% 
-                                      Samples)
-    ConcentrationPathRef <- as.matrix(PathRef %*% 
-                                        Samples)
-    
+    ConcentrationPath1 <- as.matrix(Path1 %*% Samples)
+    ConcentrationPath2 <- as.matrix(Path2 %*% Samples)
+    ConcentrationPathRef <- as.matrix(PathRef %*% Samples)
     
     if (Filter) {
       Min_p1 <- rowMins(ConcentrationPath1)
@@ -129,44 +108,31 @@ GetPSI_FromTranRef <- function(Samples,
       
       names(Min_p1) <- names(Min_p2) <- names(Max_pRef) <- names(Max_p1) <- names(Max_p2) <- names(Min_pRef) <- rownames(ConcentrationPath1)
       
-      Qt_p1 <- rowQuantiles(ConcentrationPath1, 
-                            probs = 0.8)
-      Qt_p2 <- rowQuantiles(ConcentrationPath2, 
-                            probs = 0.8)
+      Qt_p1 <- rowQuantiles(ConcentrationPath1, probs = 0.8)
+      Qt_p2 <- rowQuantiles(ConcentrationPath2, probs = 0.8)
       
-      th_p <- quantile(c(Max_p1, Max_p2), 
-                       Qn)
+      th_p <- quantile(c(Max_p1, Max_p2), Qn)
       th_pRef <- quantile(Max_pRef, Qn)
       
-      Filt <- which((Min_pRef > th_pRef) & 
-                      (Qt_p1 > th_p) & (Qt_p2 > th_p))
+      Filt <- which((Min_pRef > th_pRef) & (Qt_p1 > th_p) & (Qt_p2 > th_p))
       
-      
-      ConcentrationPath1 <- ConcentrationPath1[Filt, 
-                                               ]
-      ConcentrationPath2 <- ConcentrationPath2[Filt, 
-                                               ]
-      ConcentrationPathRef <- ConcentrationPathRef[Filt, 
-                                                   ]
+      ConcentrationPath1 <- ConcentrationPath1[Filt, ]
+      ConcentrationPath2 <- ConcentrationPath2[Filt, ]
+      ConcentrationPathRef <- ConcentrationPathRef[Filt, ]
       
       PSI <- ConcentrationPath1/ConcentrationPathRef
       
       ExpEvs <- vector(mode = "list", length = dim(ConcentrationPath1)[1])
       names(ExpEvs) <- rownames(ConcentrationPath1)
       
-      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], 
-                           ncol = 3)
-      colnames(matsamples) <- c("P1", "P2", 
-                                "PRef")
+      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], ncol = 3)
+      colnames(matsamples) <- c("P1", "P2", "PRef")
       rownames(matsamples) <- colnames(ConcentrationPath1)
       
       for (i in seq_len(dim(ConcentrationPath1)[1])) {
-        matsamples[, 1] <- ConcentrationPath1[i, 
-                                              ]
-        matsamples[, 2] <- ConcentrationPath2[i, 
-                                              ]
-        matsamples[, 3] <- ConcentrationPathRef[i, 
-                                                ]
+        matsamples[, 1] <- ConcentrationPath1[i, ]
+        matsamples[, 2] <- ConcentrationPath2[i, ]
+        matsamples[, 3] <- ConcentrationPathRef[i, ]
         ExpEvs[[i]] <- matsamples
       }
       
@@ -178,19 +144,14 @@ GetPSI_FromTranRef <- function(Samples,
       ExpEvs <- vector(mode = "list", length = dim(ConcentrationPath1)[1])
       names(ExpEvs) <- rownames(ConcentrationPath1)
       
-      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], 
-                           ncol = 3)
-      colnames(matsamples) <- c("P1", "P2", 
-                                "PRef")
+      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], ncol = 3)
+      colnames(matsamples) <- c("P1", "P2", "PRef")
       rownames(matsamples) <- colnames(ConcentrationPath1)
       
       for (i in seq_len(dim(ConcentrationPath1)[1])) {
-        matsamples[, 1] <- ConcentrationPath1[i, 
-                                              ]
-        matsamples[, 2] <- ConcentrationPath2[i, 
-                                              ]
-        matsamples[, 3] <- ConcentrationPathRef[i, 
-                                                ]
+        matsamples[, 1] <- ConcentrationPath1[i, ]
+        matsamples[, 2] <- ConcentrationPath2[i, ]
+        matsamples[, 3] <- ConcentrationPathRef[i, ]
         ExpEvs[[i]] <- matsamples
       }
       
@@ -209,8 +170,7 @@ GetPSI_FromTranRef <- function(Samples,
       warning("\nNot the same number of Transcripts in GTF and Fasta references used...\n")
     }
     
-    if (any(trannames_Samples %in% trannames_gtf == 
-            FALSE)) {
+    if (any(trannames_Samples %in% trannames_gtf == FALSE)) {
       cat("\nRemoving transcripts from Samples data...")
       trannames_Samples <- trannames_Samples[trannames_Samples %in% trannames_gtf]
       if(length(trannames_Samples) == 0){
@@ -218,23 +178,17 @@ GetPSI_FromTranRef <- function(Samples,
       }
     }
     
-    
-    if (any(trannames_gtf %in% trannames_Samples == 
-            FALSE)) {
+    if (any(trannames_gtf %in% trannames_Samples == FALSE)) {
       cat("\nRemoving Events that include transcripts not annotated in Samples data...\n")
       trannames_gtf <- trannames_gtf[trannames_gtf %in% trannames_Samples]
       if(length(trannames_gtf)==0){
         stop("\nNo match between Samples and Events annotation\n")
       }
-      
-      
     }
     
     if(!length(trannames_Samples) == nrow(Samples[[1]])){
-      # Samples <- Samples[trannames_Samples,]
       aax <- which(rownames(Samples[[1]]) %in% trannames_Samples)
-      Samples <- lapply(Samples,function(X){
-        X[aax,]
+      Samples <- lapply(Samples,function(X){X[aax,]
       })
     }
     
@@ -243,18 +197,13 @@ GetPSI_FromTranRef <- function(Samples,
     Path2 <- PathsxTranscript$ExTP2[,jjx]
     PathRef <- PathsxTranscript$ExTPRef[,jjx]
     
-    
-    
     if (!identical(trannames_Samples,trannames_gtf)) {
       iix <- match(trannames_Samples,trannames_gtf)
       Path1 <- Path1[,iix]
       Path2 <- Path2[,iix]
       PathRef <- PathRef[,iix]
-      # identical(rownames(Samples[[1]]), trannames_gtf[iix])
     }
     
-    
-    # length(which(Matrix::rowSums(PathsxTranscript$ExTPRef)==0))
     rrx <- which(Matrix::rowSums(PathRef)==0)
     if(length(rrx)>0){
       Path1 <- Path1[-rrx,]
@@ -262,28 +211,14 @@ GetPSI_FromTranRef <- function(Samples,
       PathRef <- PathRef[-rrx,]
     }
     
-    ConcentrationPath1_b <- lapply(Samples,function(X){
-      return(as.matrix(Path1%*%X))
-    })
-    ConcentrationPath2_b <- lapply(Samples,function(X){
-      return(as.matrix(Path2%*%X))
-    })
-    ConcentrationPathRef_b <- lapply(Samples,function(X){
-      return(as.matrix(PathRef%*%X))
-    })
+    ConcentrationPath1_b <- lapply(Samples,function(X){return(as.matrix(Path1%*%X))})
+    ConcentrationPath2_b <- lapply(Samples,function(X){return(as.matrix(Path2%*%X))})
+    ConcentrationPathRef_b <- lapply(Samples,function(X){return(as.matrix(PathRef%*%X))})
     
     #expression max. likelihood
-    ConcentrationPath1 <- sapply(ConcentrationPath1_b, function(X){
-      X[,1]
-    })
-    ConcentrationPath2 <- sapply(ConcentrationPath2_b, function(X){
-      X[,1]
-    })
-    ConcentrationPathRef <- sapply(ConcentrationPathRef_b, function(X){
-      X[,1]
-    })
-    
-    
+    ConcentrationPath1 <- sapply(ConcentrationPath1_b, function(X){X[,1]})
+    ConcentrationPath2 <- sapply(ConcentrationPath2_b, function(X){X[,1]})
+    ConcentrationPathRef <- sapply(ConcentrationPathRef_b, function(X){X[,1]})
     
     if (Filter) {
       Min_p1 <- rowMins(ConcentrationPath1)
@@ -296,17 +231,13 @@ GetPSI_FromTranRef <- function(Samples,
       
       names(Min_p1) <- names(Min_p2) <- names(Max_pRef) <- names(Max_p1) <- names(Max_p2) <- names(Min_pRef) <- rownames(ConcentrationPath1)
       
-      Qt_p1 <- rowQuantiles(ConcentrationPath1, 
-                            probs = 0.8)
-      Qt_p2 <- rowQuantiles(ConcentrationPath2, 
-                            probs = 0.8)
+      Qt_p1 <- rowQuantiles(ConcentrationPath1, probs = 0.8)
+      Qt_p2 <- rowQuantiles(ConcentrationPath2, probs = 0.8)
       
-      th_p <- quantile(c(Max_p1, Max_p2), 
-                       Qn)
+      th_p <- quantile(c(Max_p1, Max_p2), Qn)
       th_pRef <- quantile(Max_pRef, Qn)
       
-      Filt <- which((Min_pRef > th_pRef) & 
-                      (Qt_p1 > th_p) & (Qt_p2 > th_p))
+      Filt <- which((Min_pRef > th_pRef) & (Qt_p1 > th_p) & (Qt_p2 > th_p))
       
       
       PSI <- vector(mode = "list",length = length(Samples))
@@ -316,33 +247,23 @@ GetPSI_FromTranRef <- function(Samples,
       }
       
       PSI <- array(unlist(PSI,use.names = FALSE), c(dim(PSI[[1]]),length(PSI)),
-                   dimnames = list(rownames(PSI[[1]]),
-                                   c(),
-                                   names(PSI)))
+                   dimnames = list(rownames(PSI[[1]]),c(),names(PSI)))
       
-      ConcentrationPath1 <- ConcentrationPath1[Filt, 
-                                               ]
-      ConcentrationPath2 <- ConcentrationPath2[Filt, 
-                                               ]
-      ConcentrationPathRef <- ConcentrationPathRef[Filt, 
-                                                   ]
+      ConcentrationPath1 <- ConcentrationPath1[Filt, ]
+      ConcentrationPath2 <- ConcentrationPath2[Filt, ]
+      ConcentrationPathRef <- ConcentrationPathRef[Filt, ]
       
       ExpEvs <- vector(mode = "list", length = dim(ConcentrationPath1)[1])
       names(ExpEvs) <- rownames(ConcentrationPath1)
       
-      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], 
-                           ncol = 3)
-      colnames(matsamples) <- c("P1", "P2", 
-                                "PRef")
+      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], ncol = 3)
+      colnames(matsamples) <- c("P1", "P2", "PRef")
       rownames(matsamples) <- colnames(ConcentrationPath1)
       
       for (i in seq_len(dim(ConcentrationPath1)[1])) {
-        matsamples[, 1] <- ConcentrationPath1[i, 
-                                              ]
-        matsamples[, 2] <- ConcentrationPath2[i, 
-                                              ]
-        matsamples[, 3] <- ConcentrationPathRef[i, 
-                                                ]
+        matsamples[, 1] <- ConcentrationPath1[i, ]
+        matsamples[, 2] <- ConcentrationPath2[i, ]
+        matsamples[, 3] <- ConcentrationPathRef[i, ]
         ExpEvs[[i]] <- matsamples
       }
       
@@ -356,36 +277,24 @@ GetPSI_FromTranRef <- function(Samples,
       }
       
       PSI <- array(unlist(PSI,use.names = FALSE), c(dim(PSI[[1]]),length(PSI)),
-                   dimnames = list(rownames(PSI[[1]]),
-                                   c(),
-                                   names(PSI)))
+                   dimnames = list(rownames(PSI[[1]]),c(),names(PSI)))
       
       ExpEvs <- vector(mode = "list", length = dim(ConcentrationPath1)[1])
       names(ExpEvs) <- rownames(ConcentrationPath1)
       
-      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], 
-                           ncol = 3)
-      colnames(matsamples) <- c("P1", "P2", 
-                                "PRef")
+      matsamples <- matrix(0, nrow = dim(ConcentrationPath1)[2], ncol = 3)
+      colnames(matsamples) <- c("P1", "P2", "PRef")
       rownames(matsamples) <- colnames(ConcentrationPath1)
       
       for (i in seq_len(dim(ConcentrationPath1)[1])) {
-        matsamples[, 1] <- ConcentrationPath1[i, 
-                                              ]
-        matsamples[, 2] <- ConcentrationPath2[i, 
-                                              ]
-        matsamples[, 3] <- ConcentrationPathRef[i, 
-                                                ]
+        matsamples[, 1] <- ConcentrationPath1[i, ]
+        matsamples[, 2] <- ConcentrationPath2[i, ]
+        matsamples[, 3] <- ConcentrationPathRef[i, ]
         ExpEvs[[i]] <- matsamples
       }
       
       Result <- list(PSI = PSI, ExpEvs = ExpEvs)
       return(Result)
     }
-    
   }
-  
-  
-  
-  
 }

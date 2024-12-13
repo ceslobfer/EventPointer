@@ -3,24 +3,23 @@
 \name{EventDetectionMultipath}
 \alias{EventDetectionMultipath}
 \title{Detect splicing multipath events using EventPointer methodology}
+\description{
+Identification of all the multipath alternative splicing events in the splicing graphs.
+}
 \usage{
 EventDetectionMultipath(Input, cores, Path, paths = 2)
 }
 \arguments{
-\item{Input}{Output of the PrepareBam_EP function}
+\item{Input}{Output of the \code{EventsDetection_BAM} function.}
 
-\item{cores}{Number of cores used for parallel processing}
+\item{cores}{Number of cores used for parallel processing.}
 
-\item{Path}{Directory where to write the EventsFound_RNASeq.txt file}
+\item{Path}{Directory where to write the EventsFound_RNASeq.txt file.}
 
 \item{paths}{Maximum number of paths of the events to find.}
 }
 \value{
-list with all the events found for all the genes present in the experiment.
-It also generates a file called EventsFound_RNASeq.txt with the information each event.
-}
-\description{
-Identification of all the multipath alternative splicing events in the splicing graphs
+List with all the events found for all the genes present in the experiment and a file called EventsFound_RNASeq.txt with the information each event.
 }
 \examples{
 \dontrun{

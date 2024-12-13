@@ -99,6 +99,10 @@
 \alias{myphyper}
 \alias{reclasify_intern}
 \title{EventPointer Internal Functions}
+\description{
+Internal functions used by EventPointer in the different
+steps of the algorithm
+}
 \usage{
 annotateEvents(Events, PSR_Gene, Junc_Gene, Gxx)
 
@@ -558,9 +562,5 @@ reclasify_intern(SG, mievento, pp1, pp2, ppref)
 }
 \value{
 Internal outputs
-}
-\description{
-Internal functions used by EventPointer in the different
-steps of the algorithm
 }
 \keyword{internal}

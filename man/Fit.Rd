@@ -3,16 +3,15 @@
 \name{Fit}
 \alias{Fit}
 \title{Result of EventPointer_Bootstrap}
-\format{
-A \code{list} object
+\description{
+Result of EventPointer_Bootstrap.
 }
 \usage{
 data(Fit)
 }
-\value{
-A list containing the summary of the Bootstrap analysis: DeltaPSI, Pvalues, FDR. This info can be
-obtained in a simple table with the function ResulTable.
+\format{
+A \code{list} object.
 }
-\description{
-Result of EventPointer_Bootstrap
+\value{
+A list containing the summary of the Bootstrap analysis: DeltaPSI, Pvalues, FDR. This info can be obtained in a simple table with the function \code{ResulTable}.
 }

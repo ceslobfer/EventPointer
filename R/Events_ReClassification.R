@@ -12,7 +12,7 @@
 #' Further, EP adds a new type of event: "multiple skipping exon". 
 #' These events are characterized by presenting several exons in a 
 #' row as alternative exons. If there is only one alternative exon
-#'  we would be talking about a "Casstte Exon".
+#'  we would be talking about a "Cassette Exon".
 #' 
 #' 
 #'
@@ -29,15 +29,15 @@
 #' @examples
 #'
 #'    #load splicing graph
-#' data("SG_reclassify")
-#' 
-#' #load table with info of the events
-#' PathFiles<-system.file("extdata",package="EventPointer")
-#' inputFile <- paste(PathFiles,"/Events_found_class.txt",sep="")
-#' EventTable <- read.delim(file=inputFile)
-#' #this table has the information of 5 complex events.
-#' 
-#' EventTable_new <- Events_ReClassification(EventTable = EventTable,
+#'    data("SG_reclassify")
+#'    
+#'    #load table with info of the events
+#'    PathFiles<-system.file("extdata",package="EventPointer")
+#'    inputFile <- paste(PathFiles,"/Events_found_class.txt",sep="")
+#'    EventTable <- read.delim(file=inputFile)
+#'    #this table has the information of 5 complex events.
+#'    
+#'    EventTable_new <- Events_ReClassification(EventTable = EventTable,
 #'                                           SplicingGraph = SG_reclassify)
 #'          
 #'     
@@ -80,26 +80,18 @@ Events_ReClassification <- function(EventTable,SplicingGraph){
   misnewtype <- c()
     for(jj in seq_len(length(uux))){
       setTxtProgressBar(pb, jj)
-      # cat(jj,"\n")
       mievento <- EventTable$ID[uux][jj]
-      # mievento
       ggx <- match(EventTable$GeneName[uux][jj],names(SplicingGraph))
-      # ggx
       SG <- SplicingGraph[[ggx]]
       
       pp1 <- EventTable$Path.1[uux][jj]
       pp2 <- EventTable$Path.2[uux][jj]
       ppref <- EventTable$Path.Reference[uux][jj]
-      misnewtype <- c(misnewtype,reclasify_intern(SG = SG,mievento = mievento,
-                                                  pp1=pp1,pp2=pp2,ppref=ppref))
-      
+      misnewtype <- c(misnewtype,reclasify_intern(SG = SG,mievento = mievento,pp1=pp1,pp2=pp2,ppref=ppref))
     }
   
   close(pb)
   cat("\nReclassification Finished\n")
-  # Result <- unlist(Result)
-  # EventTable$EventType_new[uux] <- Result
-  
   EventTable$EventType_new[uux] <- misnewtype
   
   return(EventTable)
@@ -128,25 +120,19 @@ Events_ReClassificationBAM <- function(EventTable,SplicingGraph){
   misnewtype <- c()
   for(jj in seq_len(length(uux))){
     setTxtProgressBar(pb, jj)
-    # cat(jj,"\n")
     mievento <- EventTable$ID[uux][jj]
-    # mievento
     ggx <- match(EventTable$GeneName[uux][jj],names(SplicingGraph))
-    # ggx
     SG <- SplicingGraph[[ggx]]
     
     pp1 <- EventTable$Path.1[uux][jj]
     pp2 <- EventTable$Path.2[uux][jj]
     ppref <- EventTable$Path.Reference[uux][jj]
-    misnewtype <- c(misnewtype,reclasify_intern(SG = SG,mievento = mievento,
-                                                pp1=pp1,pp2=pp2,ppref=ppref))
+    misnewtype <- c(misnewtype,reclasify_intern(SG = SG,mievento = mievento,pp1=pp1,pp2=pp2,ppref=ppref))
     
   }
   
   close(pb)
   cat("\nReclassification Finished\n")
-  # Result <- unlist(Result)
-  # EventTable$EventType_new[uux] <- Result
   
   EventTable$EventType_new[uux] <- misnewtype
   

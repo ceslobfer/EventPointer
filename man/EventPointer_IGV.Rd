@@ -3,6 +3,9 @@
 \name{EventPointer_IGV}
 \alias{EventPointer_IGV}
 \title{EventPointer IGV Visualization}
+\description{
+Generates of files to be loaded in IGV for visualization and interpretation of events.
+}
 \usage{
 EventPointer_IGV(
   Events,
@@ -31,20 +34,20 @@ GTF file to be used.}
 
 \item{PathGTF}{Directory where to write the GTF files.}
 
-\item{EventsFile}{Path to EventsFound.txt file generated with CDFfromGTF function.}
+\item{EventsFile}{Path to EventsFound.txt file generated with \code{CDFfromGTF} function.}
 
 \item{microarray}{Microarray used to create the CDF file. Must be one of: HTA-2_0,
-ClariomD, RTA or MTA}
+ClariomD, RTA or MTA.}
 }
 \value{
 The function displays a progress bar to show the user the progress of the function.
 Once the progress bar reaches 100%, two .gtf files are written to the specified directory
-in PathGTF. The created files are: 1) paths.gtf : GTF file representing the alternative splicing
-events and 2) probes.gtf : GTF file representing the probes
-that measure each event and each path.
+in PathGTF. 
+The created files are: 
+\itemize{
+  \item \code{paths.gtf}: GTF file representing the alternative splicing events.
+  \item \code{probes.gtf}: GTF file representing the probes that measure each event and each path.
 }
-\description{
-Generates of files to be loaded in IGV for visualization and interpretation of events
 }
 \examples{
 
@@ -69,16 +72,14 @@ Generates of files to be loaded in IGV for visualization and interpretation of e
                       Qn=0.25,
                       Statistic='LogFC',
                       PSI=TRUE)
-
- EventPointer_IGV(Events=Events[1,,drop=FALSE],
-                  input='AffyGTF',
-                  inputFile=DONSON_GTF,
-                  PSR=PSRProbes,
-                  Junc=JunctionProbes,
-                  PathGTF=Directory,
-                 EventsFile= EventsFound,
-                 microarray='HTA-2_0')
-                 
+                      
+   EventPointer_IGV(Events=Events[1,,drop=FALSE],
+                    input='AffyGTF',
+                    inputFile=DONSON_GTF,
+                    PSR=PSRProbes,
+                    Junc=JunctionProbes,
+                    PathGTF=Directory,
+                    EventsFile= EventsFound,
+                    microarray='HTA-2_0')
 }
-
 }

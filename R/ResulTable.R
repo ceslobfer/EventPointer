@@ -60,12 +60,9 @@ ResulTable <- function(EP_Result,coef=1,number=Inf){
     lfdr <- EP_Result$LocalFDR[[coef]]$lfdr2
     qvalues <- EP_Result$LocalFDR[[coef]]$qvalues
   }
+  
   # deltaPSI
   pvalues <- EP_Result$Pvalues[,coef]
-  
-  
-  
-  # identical(rownames(deltaPSI),names(pvalues))
   
   table <- data.frame(deltaPSI = deltaPSI,
                       pvalue = pvalues,

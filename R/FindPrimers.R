@@ -145,8 +145,6 @@ FindPrimers<-function(SG,EventNum,Primer3Path,Dir,mygenomesequence,taqman = NA, 
     stop("taqman variable should be equal to TRUE or FALSE")
   }
   
-  
-  
   if (is.null(SG)){
     stop("SG field is empty")
   }
@@ -158,8 +156,6 @@ FindPrimers<-function(SG,EventNum,Primer3Path,Dir,mygenomesequence,taqman = NA, 
   if (EventNum <=0){
     stop("EventNum field is empty or is not > 0")
   }
-  
-  
   
   if (is.null(Primer3Path)){
     stop("Primer3Path field is empty")
@@ -173,34 +169,21 @@ FindPrimers<-function(SG,EventNum,Primer3Path,Dir,mygenomesequence,taqman = NA, 
     stop("Dir = Complete path where primer3web_v4_0_0_default_settings.txt file and primer3_config directory are stored")
   }
   
-  
   if(!file.exists(Primer3Path)){
     stop("Primer3Path field should point to the .exe of Primers3.
          Check in the vignette for more information")
   }
-  
-  
-  
-  
   
   if(length(grep("chr",SG$Edges$Chr))==0){
     SG$Edges$Chr <- paste0("chr",SG$Edges$Chr)
   }
   
   
-  
-  
   randSol <- getRandomFlow(SG$Incidence, ncol = 10)
   Events <- findTriplets(randSol)
   Events <- getEventPaths(Events, SG)
   
-  # Misprimers <- vector(mode = "list",length = length(EventNum))
-  # names(Misprimers) <- EventNum
-  
-  # for(ttx in 1:length(EventNum)){
-  
   Event<- Events[[EventNum]]
-  
   
   # We check if the Event is placed in a reverse strand:
   if (Event$P1$Strand[1]=="-"){
@@ -212,11 +195,6 @@ FindPrimers<-function(SG,EventNum,Primer3Path,Dir,mygenomesequence,taqman = NA, 
   # Get general data for all possible combinations of exons.
   generaldata <- getgeneraldata(SG,Event,shortdistpenalty)
   
-  # if(any(sapply(generaldata$exonsPathsandRef,length)==0)){
-  #   Misprimers[[ttx]] <- "Not possible to place primers due to the structure of the Event."
-  #   next()
-  # }
-  
   # Search and ranking of suitable combinations of exons.
   FinalExons <- try(getFinalExons(generaldata, 
                                   maxLength,
@@ -227,29 +205,21 @@ FindPrimers<-function(SG,EventNum,Primer3Path,Dir,mygenomesequence,taqman = NA, 
                                   minsep,wminsep,
                                   valuethreePenalty,
                                   minexonlength),silent = TRUE)
-  # if(classsss(FinalExons)=="try-error"){
+
   if(is(FinalExons,"try-error")){
-    # Misprimers[[ttx]] <- "Not possible to place primers due to the structure of the Event."
-    # next()
     FinalInfo <- "Not possible to place primers due to the structure of the Event."
     return(FinalInfo)
   }
-  # Get sequences for best suitables combinations.
   FinalSeq <- try(PrimerSequenceGeneral(taqman, FinalExons,
                                         generaldata,SG,Dir, 
                                         nPrimers,
                                         Primer3Path=Primer3Path,maxLength,minsep,wminsep,
                                         valuethreePenalty,wnpaths,qualityfilter,mygenomesequence),silent = TRUE)
   
-  # if(classsss(FinalSeq)=="try-error"){
   if(is(FinalSeq,"try-error")){
-    # Misprimers[[ttx]] <- "Not possible to place primers due to the structure of the Event."
-    # next()
     FinalInfo <- "Not possible to place primers due to the structure of the Event."
     return(FinalInfo)
   }
-  
-  # if (classsss(FinalSeq)!="character"){
   if (!is(FinalSeq,"character")){
     PrimerProbes <- data.frame(cbind(rep(NA,nrow(FinalSeq)),
                                      rep(NA,nrow(FinalSeq)),
@@ -273,9 +243,5 @@ FindPrimers<-function(SG,EventNum,Primer3Path,Dir,mygenomesequence,taqman = NA, 
   }
   
   return(FinalInfo)
-  # Misprimers[[ttx]] <- FinalInfo
-  # }
-  
-  # return(Misprimers)
   
 }

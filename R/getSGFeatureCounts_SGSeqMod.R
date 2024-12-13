@@ -34,13 +34,10 @@ listCHRFileCount <- function(which, valSample, list_features) {
   file_bam <- valSample$file_bam
   paired_end <- valSample$paired_end
   sample_name <- valSample$sample_name
-  addWhich <-
-    list(file_bam, paired_end, sample_name, which, features)
-  names(addWhich) <-
-    c("file_bam", "paired_end", "sample_name", "which", "features")
+  addWhich <-list(file_bam, paired_end, sample_name, which, features)
+  names(addWhich) <-c("file_bam", "paired_end", "sample_name", "which", "features")
   return(addWhich)
 }
-
 
 getSGFeatureCounts <- function(sample_info,
                                features,
@@ -53,7 +50,6 @@ getSGFeatureCounts <- function(sample_info,
   
   if (!is(features, "SGFeatures")) {
     stop("features must be an SGFeatures object")
-    
   }
   #Get which from features
   
@@ -87,13 +83,11 @@ getSGFeatureCounts <- function(sample_info,
       for (chrStrand in chr) {
         if (sample == chrStrand$sample_name) {
           listStrand <- c(listStrand, list(chrStrand$counts))
-          
         }
       }
       if (length(listStrand) != 0) {
         listCountSample[[nameCHR]] <- listStrand
       }
-      
     }
     
     listCountSample <-
@@ -113,8 +107,6 @@ getSGFeatureCounts <- function(sample_info,
     } else{
       CountPerSample <- c(CountPerSample, list(counts))
     }
-    
-    
   }
   
   counts <- do.call(cbind, CountPerSample)
@@ -152,27 +144,23 @@ getSGFeatureCountsTotal <- function(mainCount,min_anchor, retain_coverage, verbo
     featuresPlus <- features[strand(features) == "+"]
     featuresMinus <- features[strand(features) == "-"]
     print(paste("Start + strand",as.character(seqnames(which)), sample_name, Sys.time(), sep = " "))
-    listCount[[chrName]] <- list("+" = processCounts(pairGap$gapPlus, featuresPlus, strand = "+",
-                                                     sample_name, min_anchor, retain_coverage, verbose))
+    listCount[[chrName]] <- list("+" = processCounts(pairGap$gapPlus, featuresPlus, strand = "+",sample_name, min_anchor, retain_coverage, verbose))
     print(paste("End + strand",as.character(seqnames(which)), sample_name, Sys.time(), sep = " "))
     
     gc()
     print(paste("Start - strand",as.character(seqnames(which)), sample_name, Sys.time(), sep = " "))
-    listCount[[chrName]] <- c(listCount[[chrName]],list("-" = processCounts(pairGap$gapMinus, featuresMinus, strand = "-",
-                                                                            sample_name, min_anchor, retain_coverage, verbose)))
+    listCount[[chrName]] <- c(listCount[[chrName]],list("-" = processCounts(pairGap$gapMinus, featuresMinus, strand = "-",sample_name, min_anchor, retain_coverage, verbose)))
     print(paste("End - strand",as.character(seqnames(which)), sample_name, Sys.time(), sep = " "))
     
     gc()
   }else{
     if (strand == "+"){
       featuresPlus <- features[strand(features) == "+"]
-      listCount[[chrName]] <- list("+" = processCounts(pairGap$gapPlus, featuresPlus, strand = "+",
-                                                       sample_name, min_anchor, retain_coverage, verbose))
+      listCount[[chrName]] <- list("+" = processCounts(pairGap$gapPlus, featuresPlus, strand = "+",sample_name, min_anchor, retain_coverage, verbose))
       gc()
     }else{
       featuresMinus <- features[strand(features) == "-"]
-      listCount[[chrName]] <- list("-" = processCounts(pairGap$gapMinus, featuresMinus, strand = "-",
-                                                       sample_name, min_anchor, retain_coverage, verbose))
+      listCount[[chrName]] <- list("-" = processCounts(pairGap$gapMinus, featuresMinus, strand = "-",sample_name, min_anchor, retain_coverage, verbose))
       gc()
     }
   }
@@ -183,7 +171,6 @@ getSGFeatureCountsTotal <- function(mainCount,min_anchor, retain_coverage, verbo
 
 processCounts <- function(gap, features, strand,
                           sample_name, min_anchor, retain_coverage, verbose){
-  
   
   which <- range(features)
   chrName <- as.character(which@seqnames)
@@ -211,8 +198,6 @@ processCounts <- function(gap, features, strand,
       frag_exonic <- frag_exonic[c(selectionRangeExon[1]:selectionRangeExon[2])]
       frag_intron <- frag_intron[c(selectionRangeExon[1]:selectionRangeExon[2])]
       
-      
-      
       ir <- SGSeq:::extractRangesFromFeatures(features)
       
       ## extract feature type and spliced boundaries
@@ -226,26 +211,14 @@ processCounts <- function(gap, features, strand,
       
       N <- rep(NA_integer_, length(ir))
       if (length(i_J) > 0) {
-        
-        N[i_J] <- junctionCompatible(ir[i_J], frag_exonic, frag_intron,
-                                     min_anchor)
-        
+        N[i_J] <- junctionCompatible(ir[i_J], frag_exonic, frag_intron,min_anchor)
       }
-      
       if (length(i_E) > 0) {
-        
-        E_index <- exonCompatible(ir[i_E], spliceL[i_E], spliceR[i_E],
-                                  frag_exonic, frag_intron, FALSE)
-        
+        E_index <- exonCompatible(ir[i_E], spliceL[i_E], spliceR[i_E],frag_exonic, frag_intron, FALSE)
         N[i_E] <- elementNROWS(E_index)
-        
       }
       if (length(i_S) > 0) {
-        
-        N[i_S] <- splicesiteOverlap(ir[i_S],
-                                    sub("splice", "", type[i_S], fixed = TRUE),
-                                    frag_exonic, frag_intron, min_anchor, "unspliced")
-        
+        N[i_S] <- splicesiteOverlap(ir[i_S],sub("splice", "", type[i_S], fixed = TRUE),frag_exonic, frag_intron, min_anchor, "unspliced")
       }
       if (retain_coverage) {
         
@@ -253,34 +226,22 @@ processCounts <- function(gap, features, strand,
         counts$N_splicesite <- IntegerList(vector("list", nrow(counts)))
         counts$coverage <- RleList(IntegerList(vector("list", nrow(counts))))
         if (length(i_J) > 0) {
-          
-          counts$N_splicesite[i_J] <- splicesiteCounts(ir[i_J],
-                                                       frag_exonic, frag_intron, min_anchor, "junction", "all")
-          
+          counts$N_splicesite[i_J] <- splicesiteCounts(ir[i_J],frag_exonic, frag_intron, min_anchor, "junction", "all")
         }
         if (length(i_E) > 0) {
-          
-          counts$N_splicesite[i_E] <- splicesiteCounts(ir[i_E],
-                                                       frag_exonic, frag_intron, min_anchor, "exon", "spliced")
-          counts$coverage[i_E] <- exonCoverage(ir[i_E], E_index,
-                                               frag_exonic)
-          
+          counts$N_splicesite[i_E] <- splicesiteCounts(ir[i_E],frag_exonic, frag_intron, min_anchor, "exon", "spliced")
+          counts$coverage[i_E] <- exonCoverage(ir[i_E], E_index,frag_exonic)
         }
         if (strand == "-") {
-          
           counts$N_splicesite <- endoapply(counts$N_splicesite, rev)
           counts$coverage <- endoapply(counts$coverage, rev)
         }
-        
       } else {
-        
         counts <- N
-        
       }
       if (verbose) generateCompleteMessage(paste(sample_name, gr2co(which)))
       rm(N)
       rm(E_index)
-      
       res_count <- list(counts = counts, sample_name=sample_name)
     }
   }
@@ -288,14 +249,4 @@ processCounts <- function(gap, features, strand,
   
 }
 
-
-# rlang::env_unlock(env = asNamespace('SGSeq'))
-# rlang::env_binding_unlock(env = asNamespace('SGSeq'))
-# assign('getSGFeatureCounts', getSGFeatureCounts, envir = asNamespace('SGSeq'))
-# assign('sampleWhichCount', sampleWhichCount, envir = asNamespace('SGSeq'))
-# assign('listCHRFileCount', listCHRFileCount, envir = asNamespace('SGSeq'))
-# assign('getSGFeatureCountsTotal', getSGFeatureCountsTotal, envir = asNamespace('SGSeq'))
-# assign('processCounts', processCounts, envir = asNamespace('SGSeq'))
-# rlang::env_binding_lock(env = asNamespace('SGSeq'))
-# rlang::env_lock(asNamespace('SGSeq'))
 

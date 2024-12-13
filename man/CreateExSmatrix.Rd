@@ -3,6 +3,9 @@
 \name{CreateExSmatrix}
 \alias{CreateExSmatrix}
 \title{Events X RBPS matrix creation}
+\description{
+Generates the Events x RBP matrix for the splicing factor enrichment analysis.
+}
 \usage{
 CreateExSmatrix(
   pathtoeventstable,
@@ -15,25 +18,22 @@ CreateExSmatrix(
 )
 }
 \arguments{
-\item{pathtoeventstable}{Path to eventsFound.txt with the information of all the events}
+\item{pathtoeventstable}{Path to eventsFound.txt with the information of all the events.}
 
-\item{SG_List}{List with the information of the splicing graph of the genes. Returned by the funciotn EventDetectio_transcriptome}
+\item{SG_List}{List with the information of the splicing graph of the genes. Returned by the function \code{EventDetection_transcriptome}.}
 
-\item{nt}{Number of nt up and down for the splicing regions of each event}
+\item{nt}{Number of nt up and down for the splicing regions of each event.}
 
-\item{Peaks}{Table with the peaks}
+\item{Peaks}{Table with the peaks.}
 
-\item{POSTAR}{Table with peaks of POSTAR}
+\item{POSTAR}{Table with peaks of POSTAR.}
 
-\item{EventsRegions}{Events regions if calculated prevously. Not need to calculated again.}
+\item{EventsRegions}{Events regions if calculated previously. Not need to calculated again.}
 
-\item{cores}{Number of cores if user want to run in parallel.}
+\item{cores}{Number of cores if user wants to run in parallel.}
 }
 \value{
-The function returns a list with the ExS matrix and with the splicing regions of the events. If the Splicign regions
+The function returns a list with the ExS matrix and with the splicing regions of the events. If the Splicing regions
     is an input of the function then only the ExS matrix will be returned. The ExS matrix is the input for the Splicing Factor
     enrichment analysis.
-}
-\description{
-Generates the Events x RBP matrix for the splicing factor enrichment analysis.
 }

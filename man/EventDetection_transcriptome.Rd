@@ -3,10 +3,15 @@
 \name{EventDetection_transcriptome}
 \alias{EventDetection_transcriptome}
 \title{EventDetection_transcriptome}
+\description{
+Finds all the possible alternative splicing (AS) events given a reference transcriptome. This function use parallel foreach. User must
+set the value of cores (by default equal to one). Moreover, it will create a .txt file with the relative information of all the
+AS events found. Besides, it will return a list with main information of the splicing graph of each event. This list will be used as an
+input in downstream functions (\code{Get_PSI_FromTranRef}, \code{FindPrimers}, and \code{EventPointer_RNASeq_TranRef_IGV})
+}
 \usage{
 EventDetection_transcriptome(
   inputFile = NULL,
-  Transcriptome = NULL,
   Pathtxt = NULL,
   cores = 1
 )
@@ -14,30 +19,19 @@ EventDetection_transcriptome(
 \arguments{
 \item{inputFile}{Path to the GTF file of the reference transcriptome.}
 
-\item{Transcriptome}{Name of the transcriptome}
+\item{Pathtxt}{Directory to save the .txt of the events found.}
 
-\item{Pathtxt}{Directory to save the .txt of the events found}
-
-\item{cores}{Number of cores using in the parallel processing (by default = 1)}
+\item{cores}{Number of cores using in the parallel processing. Default value is 1.}
 }
 \value{
-a list is returned with the following information:
-
-ExTP1  a sparce matrix of Events x Transcripts that relates which isoform build up the path1 of each event.
-
-ExTP2  a sparce matrix of Events x Transcripts that relates which isoform build up the path2 of each event.
-
-ExTPRef  a sparce matrix of Events x Transcripts that relates which isoform build up the pathRef of each event.
-
-transcritnames  a vector with the annotation names of the isoforms.
-
-SG_List  A list containing the information of the splicing graph of each gene.
+A list is returned with the following information:
+\itemize{
+  \item \code{ExTP1}: A sparse matrix of Events x Transcripts that relates which isoform builds up the path1 of each event.
+  \item \code{ExTP2}: A sparse matrix of Events x Transcripts that relates which isoform builds up the path2 of each event.
+  \item \code{ExTPRef}: A sparse matrix of Events x Transcripts that relates which isoform builds up the pathRef of each event.
+  \item \code{transcritnames}: A vector with the annotation names of the isoforms.
+  \item \code{SG_List}: A list containing the information of the splicing graph of each gene.
 }
-\description{
-Finds all the possible alternative splicing (AS) events given a reference transcriptome. This function use parallel foreach. User must
-set the value of cores (by default equal to one). Moreover, it will create a .txt file with the relative information of all the
-AS events found. Besides, it will return a list with main information of the splicing graph of each event. This list will be used as an
-input in downstream functions (Get_PSI_FromTranRef, FindPrimers, and EventPointer_RNASeq_TranRef_IGV)
 }
 \examples{
 
@@ -46,7 +40,6 @@ input in downstream functions (Get_PSI_FromTranRef, FindPrimers, and EventPointe
          inputFile <- paste(PathFiles,"/gencode.v24.ann_2genes.gtf",sep="")
          Transcriptome <- "Gencode24_2genes"
          Pathtxt <- tempdir()
-         
          
          # Run the function 
          

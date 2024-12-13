@@ -22,8 +22,7 @@
 #' @importFrom tximport tximport
 
 
-getbootstrapdata <- function(PathSamples,
-                             type){
+getbootstrapdata <- function(PathSamples,type){
   
   if(is.null(PathSamples)){
     stop("PathSamples field empty")
@@ -31,7 +30,6 @@ getbootstrapdata <- function(PathSamples,
   if(is.na(type)){
     stop("type field empty")
   }
-  
   
   if(type == "salmon"){
     
@@ -41,17 +39,12 @@ getbootstrapdata <- function(PathSamples,
     txi.inf.rep <- tximport(PathSamples, type = type, txOut = TRUE,countsFromAbundance="no",dropInfReps = FALSE)
     
     abundance <- txi.inf.rep$counts
-    # dim(abundance)
-    # dim(txi.inf.rep$length)
     totalSums <- colSums(abundance)
     abundance <- t(t(abundance)/totalSums)
     abundance <- abundance/(txi.inf.rep$length)*1e9
-    # nb <- ncol(txi.inf.rep$infReps[[1]])
     data <- vector(mode = "list",length = ncol(abundance))
     names(data) <- colnames(abundance)
     for (i in seq_len(ncol(abundance))){
-      # i <- 1  
-      # identical(names(txi.inf.rep$infReps),colnames(abundance))
       bb <- txi.inf.rep$infReps[[i]]/txi.inf.rep$length[,i]/totalSums[i]*1e9
       data[[i]] <- cbind(abundance[,i],bb)
     }
@@ -65,17 +58,12 @@ getbootstrapdata <- function(PathSamples,
     
     txi.inf.rep <- tximport(PathSamples, type = type, txOut = TRUE,countsFromAbundance="no",dropInfReps = FALSE)
     abundance <- txi.inf.rep$counts
-    # dim(abundance)
-    # dim(txi.inf.rep$length)
     totalSums <- colSums(abundance)
     abundance <- t(t(abundance)/totalSums)
     abundance <- abundance/(txi.inf.rep$length)*1e9
-    # nb <- ncol(txi.inf.rep$infReps[[1]])
     data <- vector(mode = "list",length = ncol(abundance))
     names(data) <- colnames(abundance)
     for (i in seq_len(ncol(abundance))){
-      # i <- 1  
-      # identical(names(txi.inf.rep$infReps),colnames(abundance))
       bb <- txi.inf.rep$infReps[[i]]/txi.inf.rep$length[,i]/totalSums[i]*1e9
       data[[i]] <- cbind(abundance[,i],bb)
     }

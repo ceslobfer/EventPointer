@@ -3,56 +3,59 @@
 \name{EventPointer_Bootstraps}
 \alias{EventPointer_Bootstraps}
 \title{EventPointer_Bootstraps}
+\description{
+Statistical analysis of alternative splicing events with bootstrap technique.
+}
 \usage{
 EventPointer_Bootstraps(
   PSI,
   Design,
   Contrast,
-  cores = 1,
-  ram = 0.1,
   nBootstraps = 10000,
   UsePseudoAligBootstrap = TRUE,
-  Threshold = 0
+  Threshold = 0,
+  cores = 1,
+  ram = 0.1
 )
 }
 \arguments{
-\item{PSI}{Array or matrix that contains the values of PSI calculated in the function GetPSIFromTranRef.
-If bootstrap option was selected in GetPSIFromTranRef, input must be an array. If not, input must be a matrix}
+\item{PSI}{Array or matrix that contains the values of PSI calculated in the function \code{GetPSIFromTranRef}.
+If bootstrap option was selected in GetPSIFromTranRef, input must be an array. If not, input must be a matrix.}
 
-\item{Design}{Design matrix}
+\item{Design}{A matrix defining the linear model. Each row corresponds to an array, and each column corresponds to a coefficient (such as the baseline and treatment effects)..}
 
-\item{Contrast}{Contrast matrix}
-
-\item{cores}{The number of cores desired to use.}
-
-\item{ram}{How many ram memory is used,in Gb.}
+\item{Contrast}{A numeric matrix with contrasts to be tested. Rows correspond to coefficients in the design matrix, and columns correspond to contrasts.}
 
 \item{nBootstraps}{How many layers, Bootstraps or samplings are going to be used. Caution, high numbers increase computational time.}
 
 \item{UsePseudoAligBootstrap}{TRUE (default) if bootstrap data from pseudoaligment want to be used or FALSe if not.}
 
-\item{Threshold}{it assigns a threshold to compute the pvalues. default = 0.}
+\item{Threshold}{it assigns a threshold to compute the pvalues. Default value is 0.}
+
+\item{cores}{The number of cores desired to use.}
+
+\item{ram}{How many ram memory is used,in Gb.}
+
 }
 \value{
 A list containing the summary of the Bootstrap analysis: DeltaPSI, Pvalues, FDR. This info can be
-obtained in a simple table with the function ResulTable.
-}
-\description{
-Statistical analysis of alternative splicing events with bootstrap technique.
+obtained in a simple table with the function \code{ResulTable}.
 }
 \examples{
-       data(PSIss)
-       PSI <- PSIss$PSI
-       
-       Dmatrix <- cbind(1,rep(c(0,1),each=2))
-       Cmatrix <- matrix(c(0,1),nrow=2)
-       
-       Fit <- EventPointer_Bootstraps(PSI = PSI,
-                                      Design = Dmatrix,
-                                      Contrast = Cmatrix,
-                                      cores = 1,
-                                      ram = 1,
-                                      nBootstraps = 10,
-                                      UsePseudoAligBootstrap = TRUE)
-
+\dontrun{
+        data(PSIss)
+        PSI <- PSIss$PSI
+        
+        Dmatrix <- cbind(1,rep(c(0,1),each=2))
+        Cmatrix <- matrix(c(0,1),nrow=2)
+        
+        Fit <- EventPointer_Bootstraps(PSI = PSI,
+                                       Design = Dmatrix,
+                                       Contrast = Cmatrix,
+                                       nBootstraps = 10,
+                                       UsePseudoAligBootstrap = TRUE,
+                                       Threshold = 0,
+                                       cores = 1,
+                                       ram = 1)
+}
 }

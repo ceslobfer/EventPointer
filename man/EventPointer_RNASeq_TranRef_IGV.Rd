@@ -3,13 +3,17 @@
 \name{EventPointer_RNASeq_TranRef_IGV}
 \alias{EventPointer_RNASeq_TranRef_IGV}
 \title{EventPointer RNASeq from reference transcriptome IGV Visualization}
+\description{
+Generates of files to be loaded in IGV for visualization and interpretation of events detected
+from a reference transcriptome (see \code{EventDetection_transcriptome}).
+}
 \usage{
 EventPointer_RNASeq_TranRef_IGV(SG_List, pathtoeventstable, PathGTF)
 }
 \arguments{
-\item{SG_List}{List with the Splicing Graph information of the events. This list is created by EventDetection_transcriptome function.}
+\item{SG_List}{List with the Splicing Graph information of the events. This list is created by \code{EventDetection_transcriptome} function.}
 
-\item{pathtoeventstable}{Complete path to the table returned by EventDetection_transcriptome that contains the information of each event,
+\item{pathtoeventstable}{Complete path to the table returned by \code{EventDetection_transcriptome} that contains the information of each event,
 or table with specific events that the user want to load into IGV to visualize.}
 
 \item{PathGTF}{Directory where to write the GTF files.}
@@ -17,10 +21,6 @@ or table with specific events that the user want to load into IGV to visualize.}
 \value{
 The function displays a progress bar to show the user the progress of the function. Once the progress bar reaches 100%, one .gtf
 file is written to the specified directory in PathGTF. The created file is named 'paths_RNASeq.gtf'.
-}
-\description{
-Generates of files to be loaded in IGV for visualization and interpretation of events detected
-from a reference transcriptome (see EventDetection_transcriptome).
 }
 \examples{
 
@@ -32,7 +32,6 @@ from a reference transcriptome (see EventDetection_transcriptome).
   PathGTF <- tempdir()
   
   EventPointer_RNASeq_TranRef_IGV(SG_List = SG_List,pathtoeventstable = PathEventsTxt,PathGTF = PathGTF)
-  
-  
+
      
 }

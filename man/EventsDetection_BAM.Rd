@@ -3,48 +3,69 @@
 \name{EventsDetection_BAM}
 \alias{EventsDetection_BAM}
 \title{Detect splicing events using EventPointer BAM workflow}
+\description{
+This function is responsible for the detection of events from the input alignment files, their classification and the calculation of the associated PSI. 
+}
 \usage{
-EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF = NULL, 
-                          cores = 1, region=NULL, AnnEvents=T,
-                          min_junction_count = 5, max_complexity = 100,
-                          lambda = NULL,nboot = 20,
-                          PathSGResult = ".")
+EventsDetection_BAM(PathSamplesAbundance, 
+                    PathTranscriptomeGTF, 
+                    region = 16,
+                    min_junction_count = 2, 
+                    max_complexity = 30,
+                    min_n_sample = NULL,
+                    min_anchor = 6,
+                    nboot = 20,
+                    lambda = NULL,
+                    cores = 1,
+                    PathSGResult = PathSGResult)
 }
 \arguments{
 
-\item{PathSamplesAbundance}{Path to the folder with the alignment .bam files. It can be the path to a folder that contains other folders with the bams.}
+\item{PathSamplesAbundance}{Path to bam and bai files or path to folder with bam and bai files.}
 
-\item{PathTranscriptomeGTF}{GTF file used for .bam files alignment}
+\item{PathTranscriptomeGTF}{Path to file containing the regions to be analysed from the bam files in GTF format.}
 
-\item{AnnEvents} {Parameter indicating whether or not to perform the annotation process on the events to classify them as possible novo. (This process can take some time)}
+\item{region}{Numerical vector indicating the index of positions (at chromosomal level) to be analysed from the GTF. Default value is NULL so that all regions are analysed.}
 
-\item{region}{Numeric vector with the positions of the GTF regions that are intended to be used for event detection.}
+\item{min_junction_count}{Minimum number of junctions detected in the alignment to be considered in the splicing graph. Default value is 2.}
 
-\item{min_junction_count}{Minimum fragment count required for a splice junction to be included.}
+\item{max_complexity}{Maximum allowed complexity. If a locus exceeds this threshold, it is skipped, resulting in a warning. Complexity is defined as the maximum number of unique predicted splice junctions overlapping a given position. High complexity regions are often due to spurious read alignments and can slow down processing. Default value is 30.}
 
-\item{max_complexity}{Maximum allowed complexity. If a locus exceeds this threshold, it is skipped, resulting in a warning. Complexity is defined as the maximum number of unique predicted splice junctions overlapping a given position. High complexity regions are often due to spurious read alignments and can slow down processing.}
+\item{min_n_sample}{Minimum number of samples that a junction must have to be considered. Default value is 3.}
 
-\item{nboot}{Number of resamples of the quantification of the samplesto perform bootstrap.}
+\item{min_anchor}{Minimum number of aligned bases at one end of an exon to consider a junction. Default value is 6.}
 
-\item{cores}{Number of cores used for parallel processing}
+\item{nboot}{Number of resamples of the quantification of the samples to perform bootstrap. Default value is 20.}
 
-\item{PathSGResult}{Directory where to write the Splicing graph data SgFC.RData}
+\item{cores}{Number of cores used for the function. Default value is 1.}
+
+\item{PathSGResult}{Path where to save the results.}
 }
 \value{
-List with the information of all events found in samples.
+\itemize{
+  \item \code{TotalEventsFound.csv}: General data for total events detected in csv format.
+  \item \code{EventsDetection_EPBAM.RData}: Raw data per event, paths of splicing graph and counts in RData format.
+  \item \code{SgFC.RData}: Contains the splicing graph in RData format.
+  \item \code{PSI_boots.RData}: \eqn{\Psi} per event and sample in RData format.
 }
-\description{
-
 }
 \examples{
 \dontrun{
-  # Run EventDetection function
-   PathSamplesAbundance <- system.file("extdata/bams", package = "EventPointer")
-   PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
-   PathSGResult<-tempdir()
-   EventsDetection_BAM(PathSamplesAbundance, PathTranscriptomeGTF, 
-                                      cores = 9, region=16, AnnEvents=T,
-                                      min_junction_count = 5, max_complexity = 50,
-                                      PathSGResult = PathSGResult)
+  PathSamplesAbundance <- system.file("extdata/bams", package = "EventPointer")
+  PathTranscriptomeGTF <- list.files(PathSamplesAbundance,"*.gtf",full.names = T)
+  
+  PathSGResult <- tempdir()
+  EventsDetection_BAM(PathSamplesAbundance, 
+                    PathTranscriptomeGTF, 
+                    region = 16,
+                    min_junction_count = 2, 
+                    max_complexity = 30,
+                    min_n_sample = NULL,
+                    min_anchor = 6,
+                    nboot = 20,
+                    lambda = NULL,
+                    cores = 1,
+                    PathSGResult = PathSGResult)
 
+}
 }

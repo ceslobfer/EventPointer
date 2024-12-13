@@ -3,22 +3,21 @@
 \name{EventDetection}
 \alias{EventDetection}
 \title{Detect splicing events using EventPointer methodology}
+\description{
+Identification of all the alternative splicing events in the splicing graphs.
+}
 \usage{
 EventDetection(Input, cores, Path)
 }
 \arguments{
-\item{Input}{Output of the PrepareBam_EP function}
+\item{Input}{Output of \code{PrepareBam_EP}.}
 
-\item{cores}{Number of cores used for parallel processing}
+\item{cores}{Number of cores used for parallel processing.}
 
-\item{Path}{Directory where to write the EventsFound_RNASeq.txt file}
+\item{Path}{Directory where to write the EventsFound_RNASeq.txt file.}
 }
 \value{
-list with all the events found for all the genes present in the experiment.
-It also generates a file called EventsFound_RNASeq.txt with the information of each event.
-}
-\description{
-Identification of all the alternative splicing events in the splicing graphs
+List with all the events found for all the genes present in the experiment and a file called EventsFound_RNASeq.txt with the information of each event.
 }
 \examples{
 \dontrun{
@@ -27,5 +26,4 @@ Identification of all the alternative splicing events in the splicing graphs
    TxtPath<-tempdir()
    AllEvents_RNASeq<-EventDetection(SG_RNASeq,cores=1,Path=TxtPath)
    }
-
 }

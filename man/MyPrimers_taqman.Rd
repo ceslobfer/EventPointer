@@ -3,18 +3,15 @@
 \name{MyPrimers_taqman}
 \alias{MyPrimers_taqman}
 \title{Data frame with primers design for taqman PCR}
+\description{
+Data frame with primers design for taqman PCR.
+}
 \format{
-A \code{data.frame} object displays the relative
-information for primers design for taqman PCR
+A \code{data.frame} object displays the relative information for primers design for taqman PCR.
 }
 \usage{
 data(MyPrimers_taqman)
 }
 \value{
-MyPrimers_taqman object contains a data.frame with
-the information of the design primers for taqman
-PCR.
-}
-\description{
-Data frame with primers design for taqman PCR
+MyPrimers_taqman object contains a data.frame with the information of the design primers for taqman PCR.
 }

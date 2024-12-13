@@ -50,19 +50,14 @@ EventPointer_RNASeq_TranRef_IGV <- function(SG_List,pathtoeventstable,PathGTF){
   Result2$GeneName <- paste0(Result2$GeneName,"_",Result2$EventNumber)
   
   cat("\nCreating .GTF ...")
-  # Create file to store gtf for patths
+  
+  # Create file to store gtf for paths
   # (events)
-  FILE.paths <- paste(PathGTF, "/paths_RNASeq.gtf", 
-                      sep = "")
-  cat(file = FILE.paths, paste("#track name=", 
-                               shQuote("paths", type = "cmd"), " gffTags=", 
-                               shQuote("on", type = "cmd"), sep = ""), 
-      "\n")
+  FILE.paths <- paste(PathGTF, "/paths_RNASeq.gtf", sep = "")
+  cat(file = FILE.paths, paste("#track name=", shQuote("paths", type = "cmd"), " gffTags=", shQuote("on", type = "cmd"), sep = ""), "\n")
   
-  pb <- txtProgressBar(min = 0, max = nrow(Result2), 
-                       style = 3)
+  pb <- txtProgressBar(min = 0, max = nrow(Result2), style = 3)
   
-  # 1:nrow(Result2)
   for (jj in seq_len(nrow(Result2))) {
     setTxtProgressBar(pb, jj)
     
@@ -70,26 +65,19 @@ EventPointer_RNASeq_TranRef_IGV <- function(SG_List,pathtoeventstable,PathGTF){
     Gene <- gsub("_.*","",Gene)
     EvtEdg <- SG_List[[Gene]]$Edges
     
-    if (unique(EvtEdg[, "Strand"]) == 
-        "") {
+    if (unique(EvtEdg[, "Strand"]) == "") {
       EvtEdg[, "Strand"] <- "-"
     }
     
-    # iixx <- which(Result2$GeneName==Gene)
-    
-    EventPaths <- GetIGVPaths(Result2[jj, 
-                                      ], EvtEdg)
+    EventPaths <- GetIGVPaths(Result2[jj, ], EvtEdg)
     class(EventPaths[, 2]) <- "integer"
     class(EventPaths[, 3]) <- "integer"
-    WriteGTF_RNASeq(PathGTF, Result2[jj, 
-                                     ], EventPaths)
+    WriteGTF_RNASeq(PathGTF, Result2[jj, ], EventPaths)
   }
   
   close(pb)
   
   cat("\n.GTF created")
-  
-  
   
 }
 

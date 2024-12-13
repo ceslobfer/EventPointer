@@ -3,18 +3,15 @@
 \name{SG_RNASeq}
 \alias{SG_RNASeq}
 \title{Splicing graph elements predicted from BAM files}
-\format{
-A \code{SGFeatureCounts} objects with predicted splicing
-graph features and counts
+\description{
+Splicing graph elements predicted from BAM files. 
 }
 \usage{
 data(SG_RNASeq)
 }
-\value{
-SG_RNASeq object displays the predicted features found
-in the BAM files from the dataset published in Seshagiri et al.
-2012 and used in the \code{SGSeq} R package vignette.
+\format{
+A \code{SGFeatureCounts} objects with predicted splicing graph features and counts.
 }
-\description{
-Splicing graph elements predicted from BAM files
+\value{
+SG_RNASeq object displays the predicted features found in the BAM files from the dataset published in Seshagiri et al. 2012 and used in the \code{SGSeq} R package vignette.
 }

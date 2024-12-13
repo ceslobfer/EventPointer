@@ -2,49 +2,61 @@
 \name{EventsDetection_ST}
 \alias{EventsDetection_ST}
 \title{Detect splicing events using EventsDetection_ST workflow}
+\description{
+The EventsDetection_ST() function represents the initial step in the EventPointerST workflow. Similar to EventPointerBAM, this function is responsible for creating the splicing graph, identifying events, and obtaining the \eqn{\Psi} from abundance data. In this case, as event identification is based on the annotation, we can provide previously detected events data to avoid the splicing graph generation and event identification steps, for an annotation that has already been used.
+}
 \usage{
-EventsDetection_ST(PathSamplesAbundance = NULL, PathTranscriptomeGTF = NULL, EventsTranscriptome = NULL,
-                              PathEventsGTFResults=".",
-                              cores=1, typeAbundance = "kallisto", Bootstrap=T, Filter=F,
-                              Qn = 0.25)
+EventsDetection_ST(PathSamplesAbundance, 
+                    typeAbundance = "kallisto",
+                    PathTranscriptomeGTF = PathTranscriptomeGTF, 
+                    EventsTranscriptome=NULL, 
+                    Bootstrap=T, 
+                    Filter=F, 
+                    Qn = 0.25, 
+                    cores=1,
+                    PathEventsGTFResults=Pathtxt)
 }
 \arguments{
 
-\item{PathSamplesAbundance}{Path to the folder with the alignment .bam files. It can be the path to a folder that contains other folders with the bams.}
+\item{PathSamplesAbundance}{Path to quantification data of gene isoforms obtained from the corresponding pseudoaligner.}
 
-\item{PathTranscriptomeGTF}{Path to the GTF file of the reference transcriptome.}
+\item{typeAbundance}{Type of abundance files provided for the PSI analysis. The options are “salmon” or “kallisto”.}
 
-\item{EventsTranscriptome}{If the user wishes to provide events detected from a previous work, the path to the RData file can be provided.}
+\item{PathTranscriptomeGTF}{Path to gene annotation GTF file.}
 
-\item{PathEventsGTFResults}{Path to locate the results of the function.}
+\item{EventsTranscriptome}{Detected events for a GTF if you do not want to recalculate the GTF events.}
 
-\item{cores}{Number of cores used for parallel processing}
+\item{Bootstrap}{Boolean indicating whether to perform the PSI bootstrap. Default value is TRUE.}
 
-\item{typeAbundance}{Type of abundance files provided for the PSI analysis. The options are "salmon" or "kallisto".}
+\item{Filter}{Boolean variable to indicate if an expression filter is applied. Default FALSE.}
+\item{Qn}{Quantile used to filter the events (Bounded between 0-1, Q1 would be 0.25). Default value is 0.25.}
+
+\item{cores}{The number of cores desired to use.}
+
+\item{PathEventsGTFResults}{Path where the detected event data from a GTF file and the \eqn{\Psi} results will be saved.}
 }
-\item{Bootstrap}{	Boolean variable to indicate if bootstrap data from pseudo-alignment is used.}
-
-\item{Filter}{	Boolean variable to indicate if an expression filter is applied. Default FALSE.}
-
-\item{Qn}{Quartile used to filter the events (Bounded between 0-1, Qn would be 0.25 by default).}
-
 \value{
-List with the information of all events found in samples.
+\itemize{
+  \item \code{EventsTranscriptome.RData}: Detected events data in RData format.
+  \item \code{PSI_ST.RData}: \eqn{\Psi} per event and sample in RData format.
 }
-\description{
-
 }
 \examples{
 \dontrun{
-  # Run EventDetection function
   PathFiles<-system.file("extdata",package="EventPointer")
   PathTranscriptomeGTF <- paste(PathFiles,"/gencode.v24.ann_2genes.gtf",sep="")
   PathSamplesAbundance <- paste0(PathFiles,"/output")
   PathSamplesAbundance <- dir(PathSamplesAbundance,full.names = TRUE)
   Pathtxt <- tempdir()
-  EventsPSI <- EventsDetection_ST(PathSamplesAbundance,PathTranscriptomeGTF = PathTranscriptomeGTF,
-                              PathEventsGTFResults=Pathtxt,
-                              cores=1, typeAbundance = "kallisto", Bootstrap=T, Filter=F,
-                              Qn = 0.25)
-
+  
+  EventsPSI <- EventsDetection_ST(PathSamplesAbundance, 
+                                typeAbundance = "kallisto",
+                                PathTranscriptomeGTF = PathTranscriptomeGTF, 
+                                EventsTranscriptome=NULL, 
+                                Bootstrap=T, 
+                                Filter=F, 
+                                Qn = 0.25, 
+                                cores=1,
+                                PathEventsGTFResults=Pathtxt)
+}
 }

@@ -2,9 +2,9 @@
 #'
 #' Identification of all the alternative splicing events in the splicing graphs
 #'
-#' @param Input Output of the PrepareBam_EP function
-#' @param cores Number of cores used for parallel processing
-#' @param Path Directory where to write the EventsFound_RNASeq.txt file
+#' @param Input Output of PrepareBam_EP function.
+#' @param cores Number of cores used for parallel processing.
+#' @param Path Directory where to write the EventsFound_RNASeq.txt file.
 #'
 #'
 #' @return list with all the events found for all the genes present in the experiment.
@@ -18,8 +18,7 @@
 #'
 #' @export
 
-EventDetection <- function(Input, cores, 
-                           Path) {
+EventDetection <- function(Input, cores, Path) {
   ################################### Detect AS Events Using EP Methodology
   
   if (is.null(Input)) {
@@ -30,8 +29,6 @@ EventDetection <- function(Input, cores,
   if (!is(cores,"numeric")) {
     stop("Number of cores incorrect")
   }
-  
-  
   
   SgF <- rowRanges(Input)
   SgFC <- Input
@@ -51,39 +48,22 @@ EventDetection <- function(Input, cores,
   GeneIDs <- unique(GeneIDs)
   GeneIDs[is.na(GeneIDs[, 2]), 2] <- " "
   
-  
-  
-  
-  
-  
-  # registerDoMC(cores=cores)
   registerDoParallel(cores = cores)
-  # for(jj in 1:length(genes))
-  Result <- foreach(jj = seq_along(genes)) %dopar% 
-    {
-      # print(jj)
+  Result <- foreach(jj = seq_along(genes)) %dopar% {
       Gene <- genes[jj]
-      
-      SG_Gene <- SgF[geneID(SgF) == 
-                       Gene]
-      
-      iix <- match(Gene, GeneIDs[, 
-                                 1])
+      SG_Gene <- SgF[geneID(SgF) == Gene]
+      iix <- match(Gene, GeneIDs[, 1])
       
       if (!is.na(iix)) {
-        GeneName <- GeneIDs[iix, 
-                            2]
+        GeneName <- GeneIDs[iix, 2]
       } else {
         GeneName <- " "
       }
       
-      
-      if ((nrow(as.data.frame(SG_Gene)) != 
-          1) & sum(type(SG_Gene)=="J")!=0) {
+      if ((nrow(as.data.frame(SG_Gene)) != 1) & sum(type(SG_Gene)=="J")!=0) {
         featureID(SG_Gene) <- seq_len(nrow(as.data.frame(SG_Gene)))
         
-        SG_Gene_Counts <- SgFC[geneID(SgFC) == 
-                                 Gene]
+        SG_Gene_Counts <- SgFC[geneID(SgFC) == Gene]
         
         # Function to obtain the information of
         # the SG, the information returned
@@ -98,14 +78,12 @@ EventDetection <- function(Input, cores,
         # edge if we relate the SG with an
         # hydraulic installation
         
-        randSol <- getRandomFlow(SG$Incidence, 
-                                                ncol = 10)
+        randSol <- getRandomFlow(SG$Incidence, ncol = 10)
         
         # To find events, we need to have fluxes
         # different from 1 in different edges
         
-        if (any(round(randSol) != 
-                1)) {
+        if (any(round(randSol) != 1)) {
           # Identify the alternative splicing
           # events using the fluxes obtained
           # previously.  The number of fluxes
@@ -116,46 +94,33 @@ EventDetection <- function(Input, cores,
           # There should be al least one event to
           # continue the algorithm
           
-          if (nrow(Events$triplets) > 
-              0) {
-            twopaths <- which(rowSums(Events$triplets != 
-                                        0) == 3)
+          if (nrow(Events$triplets) > 0) {
+            twopaths <- which(rowSums(Events$triplets != 0) == 3)
             # Transform triplets, related with edges
             # to the corresponding edges. Also the
             # edges are divided into Path 1, Path 2
             # and Reference
             
-            Events <- getEventPaths(Events, 
-                                    SG)
-            
+            Events <- getEventPaths(Events, SG)
             
             # Condition to ensure that there is at
             # least one event
             
-            if (length(Events) > 
-                0) {
+            if (length(Events) > 0) {
               
               # Classify the events into canonical
               # categories using the adjacency matrix
               
-              Events <- ClassifyEvents(SG, 
-                                       Events, twopaths)
-              # for (i in seq_along(Events)) {
-              #   Event <- Events[[i]]
-              #   if(Event$Type=="Complex Event"){
-              #     Event$Type <- reClassificationIntern(SG, Event)
-              #   }
-              # }
+              Events <- ClassifyEvents(SG, Events, twopaths)
+
               reClassificationIntern
               # A simple piece of code to get the
               # number of counts for the three paths in
               # every event within a gene
               
-              Events <- GetCounts(Events, 
-                                  SG_Gene_Counts)
+              Events <- GetCounts(Events, SG_Gene_Counts)
               
-              Events <- Filter(Negate(is.null), 
-                               Events)
+              Events <- Filter(Negate(is.null), Events)
               
               Events <- lapply(Events, 
                                function(x) {
@@ -169,8 +134,6 @@ EventDetection <- function(Input, cores,
                                  return(x)
                                })
               
-              
-              
               Info <- AnnotateEvents_RNASeq(Events)
               
               for(i in seq_along(Events)){
@@ -178,10 +141,7 @@ EventDetection <- function(Input, cores,
                 Events[[i]]$Info <- Info[i,]
               }
               
-              # browser()
-              
-              return(list(Events = Events, 
-                          Info = Info))
+              return(list(Events = Events, Info = Info))
             }
           }
         }
@@ -192,30 +152,11 @@ EventDetection <- function(Input, cores,
   cat("\n")
   
   Result <- Filter(Negate(is.null), Result)
-  
   Events <- vector("list", length = length(Result))
-  # TxtInfo <- vector("list", length = length(Result))
   
   for (jj in seq_len(length(Result))) {
     Events[[jj]] <- Result[[jj]]$Events
-    # TxtInfo[[jj]] <- Result[[jj]]$Info
   }
-  
-  # # browser()
-  # TxtInfo <- do.call(rbind, TxtInfo)
-  # iix <- which(TxtInfo[, 2] == " ")
-  # 
-  # if (length(iix) > 0) {
-  #     Info <- matrix(unlist(strsplit(as.vector(TxtInfo[iix, 
-  #         1]), "_")), ncol = 2, byrow = TRUE)[, 
-  #         1]
-  #     TxtInfo[iix, 2] <- Info
-  # }
-  # 
-  # write.table(TxtInfo, file = paste(Path, 
-  #     "/EventsFound_RNASeq.txt", sep = ""), 
-  #     sep = "\t", row.names = FALSE, col.names = TRUE, 
-  #     quote = FALSE)
   
   return(Events)
 }
@@ -227,17 +168,11 @@ EventDetectionAnn <- function(Input, cores) {
     stop("Input field is empty")
   }
   
-  # if (classssss(cores) != "numeric") {
   if (!is(cores,"numeric")) {
     stop("Number of cores incorrect")
   }
   
-  # if (is.null(Path)) {
-  #   stop("Path field is empty")
-  # }
-  
   SgF <- Input
-  # SgFC <- Input
   
   # Obtain unique genes to find alternative
   # splicing events.
@@ -249,45 +184,30 @@ EventDetectionAnn <- function(Input, cores) {
   IdName <- apply(GeneIDs, 1, function(X) {
     A <- unlist(X[2])[1]
     return(A)
-  })
+    })
   GeneIDs[, 2] <- IdName
   GeneIDs <- unique(GeneIDs)
   GeneIDs[is.na(GeneIDs[, 2]), 2] <- " "
-  
-  
-  
-  
-  
-  
-  # registerDoMC(cores=cores)
+
   registerDoParallel(cores = cores)
-  # for(jj in 1:length(genes))
-  # Result <- for(jj in c(1:length(seq_along(genes))))
+
   Result <- foreach(jj = seq_along(genes)) %dopar%
     {
-      
-      # print(jj)
       Gene <- genes[jj]
       
       SG_Gene <- SgF[which(Gene == geneID(SgF))]
       
-      iix <- match(Gene, GeneIDs[, 
-                                 1])
+      iix <- match(Gene, GeneIDs[, 1])
       
       if (!is.na(iix)) {
-        GeneName <- GeneIDs[iix, 
-                            2]
+        GeneName <- GeneIDs[iix, 2]
       } else {
         GeneName <- " "
       }
       
       
-      if (nrow(as.data.frame(SG_Gene)) >
-          1) {
+      if (nrow(as.data.frame(SG_Gene)) >1) {
         featureID(SG_Gene) <- seq_len(nrow(as.data.frame(SG_Gene)))
-        
-        # SG_Gene_Counts <- SgFC[geneID(SgFC) == 
-        # Gene]
         
         # Function to obtain the information of
         # the SG, the information returned
@@ -302,14 +222,12 @@ EventDetectionAnn <- function(Input, cores) {
         # edge if we relate the SG with an
         # hydraulic installation
         
-        randSol <- getRandomFlow(SG$Incidence, 
-                                                ncol = 10)
+        randSol <- getRandomFlow(SG$Incidence, ncol = 10)
         
         # To find events, we need to have fluxes
         # different from 1 in different edges
         
-        if (any(round(randSol) != 
-                1)) {
+        if (any(round(randSol) != 1)) {
           # Identify the alternative splicing
           # events using the fluxes obtained
           # previously.  The number of fluxes
@@ -320,30 +238,24 @@ EventDetectionAnn <- function(Input, cores) {
           # There should be al least one event to
           # continue the algorithm
           
-          if (nrow(Events$triplets) > 
-              0) {
-            twopaths <- which(rowSums(Events$triplets != 
-                                        0) == 3)
+          if (nrow(Events$triplets) > 0) {
+            twopaths <- which(rowSums(Events$triplets != 0) == 3)
             # Transform triplets, related with edges
             # to the corresponding edges. Also the
             # edges are divided into Path 1, Path 2
             # and Reference
             
-            Events <- getEventPaths(Events, 
-                                                   SG)
-            
+            Events <- getEventPaths(Events, SG)
             
             # Condition to ensure that there is at
             # least one event
             
-            if (length(Events) > 
-                0) {
+            if (length(Events) > 0) {
               
               # Classify the events into canonical
               # categories using the adjacency matrix
               
-              Events <- ClassifyEvents(SG, 
-                                                      Events, twopaths)
+              Events <- ClassifyEvents(SG, Events, twopaths)
               
               # A simple piece of code to get the
               # number of counts for the three paths in
@@ -367,13 +279,8 @@ EventDetectionAnn <- function(Input, cores) {
                                  return(x)
                                })
               
-              
-              
               Info <- AnnotateEvents_RNASeq(Events)
-              # browser()
-              
-              return(list(Events = Events, 
-                          Info = Info))
+              return(list(Events = Events, Info = Info))
             }
           }
         }
@@ -386,28 +293,10 @@ EventDetectionAnn <- function(Input, cores) {
   Result <- Filter(Negate(is.null), Result)
   
   Events <- vector("list", length = length(Result))
-  # TxtInfo <- vector("list", length = length(Result))
   
   for (jj in seq_len(length(Result))) {
     Events[[jj]] <- Result[[jj]]$Events
-    # TxtInfo[[jj]] <- Result[[jj]]$Info
   }
-  
-  # browser()
-  # TxtInfo <- do.call(rbind, TxtInfo)
-  # iix <- which(TxtInfo[, 2] == " ")
-  # 
-  # if (length(iix) > 0) {
-  #   Info <- matrix(unlist(strsplit(as.vector(TxtInfo[iix, 
-  #                                                    1]), "_")), ncol = 2, byrow = TRUE)[, 
-  #                                                                                        1]
-  #   TxtInfo[iix, 2] <- Info
-  # }
-  
-  # write.table(TxtInfo, file = paste(Path, 
-  #                                   "/EventsFound_RNASeq.txt", sep = ""), 
-  #             sep = "\t", row.names = FALSE, col.names = TRUE, 
-  #             quote = FALSE)
   
   return(Events)
 }

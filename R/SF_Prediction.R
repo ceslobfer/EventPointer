@@ -43,9 +43,6 @@ SF_Prediction <- function(P_value_PSI,ExS,nSel=1000,significance=NULL,method="Fi
            resPred <- poissonBinomialApproach(ExS, nSel, P_value_PSI, significance, resPred,N)
          },
          Wilcoxon={
-           # nmTopEv <- significanceFunction (P_value_PSI, nSel=NULL, significance)
-           # ExS <- ExS[nmTopEv, ]
-           # resPred <- Wilcoxon.z.matrix(ExprT = t(abs(P_value_PSI[,4])),GeneGO = ExS)
            if (is.null(significance)) {
              significance = c(0.05,0.05,0.05,0.05)
            }

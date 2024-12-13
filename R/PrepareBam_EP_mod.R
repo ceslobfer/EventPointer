@@ -116,7 +116,6 @@ AnnEventsFunc <- function(EventsDetection_pred, EventsDetection_ann, cores){
     GRangesList(c(P1,P2,Ref))[[1]]
   }
   listEventsPred <- GRangesList(listEventsPred)
-  # listEventsAnn <- GRangesList()
   listEventsAnn <- foreach(event=unlist(EventsDetection_ann, recursive = F), .packages = 'GenomicRanges') %dopar% {
     P1 <- GRanges(event$P1)
     P2 <- GRanges(event$P2)

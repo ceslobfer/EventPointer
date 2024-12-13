@@ -3,13 +3,16 @@
 \name{ArrayDatamultipath}
 \alias{ArrayDatamultipath}
 \title{Preprocessed arrays data with multi-path events}
-\format{
-A \code{data.frame} with preprocessed arrays data. The preprocessing
-was done using \code{aroma.affymetrix}. See the package vignette for the
-preprocessing pipeline
+\description{
+Preprocessed arrays data with multi-path events.
 }
 \usage{
 data(ArrayDatamultipath)
+}
+\format{
+A \code{data.frame} with preprocessed arrays data. The preprocessing
+was done using \code{aroma.affymetrix}. See the package vignette for the
+preprocessing pipeline.
 }
 \value{
 ArrayDatamultipath object contains preprocessed junction
@@ -18,7 +21,4 @@ R package, refer to EventPointer vignette for the pipeline used for
 the preprocessing. The data corresponds to 4 samples from the SUM149
 Cell line hybridized to the HTA 2.0 Affymetrix array. The first two samples
 are control and the second ones are treated.
-}
-\description{
-Preprocessed arrays data with multi-path events
 }

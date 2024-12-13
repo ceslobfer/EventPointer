@@ -89,9 +89,6 @@ Protein_Domain_Enrichment <- function(PathsxTranscript,TxD,Diff_PSI,method="spea
   #FinalExPF == 0: Both paths have the Domain
   #FinalExPF == . (equal to 0): Domain that neither path1 nor path2 have
   
-  # table(FinalExPF@x)
-  
-  
   ## statistical analysis
   # rownames(Results_Table$deltaPSI)
   FinalExPF <- FinalExPF[match(rownames(Diff_PSI),rownames(FinalExPF)),]
@@ -104,10 +101,9 @@ Protein_Domain_Enrichment <- function(PathsxTranscript,TxD,Diff_PSI,method="spea
   miend <- FinalExPF_2@p[-1]
   mistart <- c(1,miend+1)
   mistart <- mistart[-length(mistart)]
-  jjx <- which((miend - mistart) <0) 
-  ### these are those with all 0 in the column (we have to remove them)
+  jjx <- which((miend - mistart) <0)
   
-  # iix <- which((miend - mistart + 1) == nrow(FinalExPF_2) ) 
+  ### these are those with all 0 in the column (we have to remove them)
   ### don't have any 0 (we want to keep them)
   
   if(length(jjx) > 0){
@@ -116,9 +112,6 @@ Protein_Domain_Enrichment <- function(PathsxTranscript,TxD,Diff_PSI,method="spea
   miend <- FinalExPF_2@p[-1]
   mistart <- c(1,miend+1)
   mistart <- mistart[-length(mistart)]
-  # jjx <- which((miend - mistart) <0) #jjx must be integer(0)
-  # midata <- data.frame(value=FinalExPF_2@x,lacolumn=NA)
-  # midata$lacolumn <- rep(seq_len(ncol(FinalExPF_2)),diff(FinalExPF_2@p))
   lacolumn <- rep(seq_len(ncol(FinalExPF_2)),diff(FinalExPF_2@p))
   lacolumn <- as.factor(lacolumn)
   Dmatrix <- model.matrix(~0+lacolumn)
@@ -131,7 +124,6 @@ Protein_Domain_Enrichment <- function(PathsxTranscript,TxD,Diff_PSI,method="spea
     FinalExPF_2 <- FinalExPF_2[,-jjx_2]
   }
   
-  
   rm(FinalExPF)
   rm(eventsxpfam_path1)
   rm(eventsxpfam_path2)
@@ -142,21 +134,7 @@ Protein_Domain_Enrichment <- function(PathsxTranscript,TxD,Diff_PSI,method="spea
   gc()
   
   results <- calculateCorrelationTest(A = t(FinalExPF_2),B = Diff_PSI,method = method)
-  # results_pear <- calculateCorrelationTest(A = t(FinalExPF_2),B = Results_Table$deltaPSI,method = "pearson")
-  
-  #check results
-  # m <- sample(1:ncol(FinalExPF_2),size=1)
-  # mm <- match(colnames(FinalExPF_2)[m],rownames(results$mycor))
-  # # cor.test(FinalExPF_2[,m],Results_Table$deltaPSI[,1],method = "pearson")
-  # cor.test(FinalExPF_2[,m],Results_Table$deltaPSI,method = "spearman")
-  # results$mycor[mm,1]
-  # results$PVAL[mm,1]
-  # results$STATISTIC[mm,1]
-  
   return(results)
-  
-  
-  
 }
 
 

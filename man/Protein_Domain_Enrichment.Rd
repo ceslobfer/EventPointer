@@ -3,31 +3,28 @@
 \name{Protein_Domain_Enrichment}
 \alias{Protein_Domain_Enrichment}
 \title{Protein_Domain_Enrichment}
+\description{
+Analyze whether the presence of a protein domain increases or decreases in the condition under study.
+}
 \usage{
 Protein_Domain_Enrichment(PathsxTranscript, TxD, Diff_PSI, method = "spearman")
 }
 \arguments{
-\item{PathsxTranscript}{the output of EventDetection_transcriptome.}
+\item{PathsxTranscript}{The output of \code{EventDetection_transcriptome}.}
 
-\item{TxD}{matrix that relates transcripts with Protein domain. Users can get it from BioMart}
+\item{TxD}{Matrix that relates transcripts with Protein domain. Users can get it from BioMart}
 
-\item{Diff_PSI}{matrix with the difference of psi of the condition under study. Can get it from the output of EventPointer_Bootstraps}
+\item{Diff_PSI}{Matrix with the difference of psi of the condition under study. Can get it from the output of \code{EventPointer_Bootstraps}.}
 
-\item{method}{a character string indicating which correlation coeffcient is to be calculated. "spearman" (default) or "pearson"
-can be selected.}
+\item{method}{A character string indicating which correlation coeffcient is to be calculated. "spearman" (default) or "pearson" can be selected.}
 }
-\value{
-A list containing the results of the protein domain enrichment anaylisis. This list contains 3 matrices in which the rows indicate
+\value{ A list containing the results of the protein domain enrichment anaylisis. This list contains 3 matrices in which the rows indicate
  the protein domains and the columns the number of contrasts. The 3 matrices are the following:
- 
- -mycor: correlation value between the deltaPSI and the DifProtDomain matrix (see more details in vignette)
- 
- -STATISTIC: the values of the test statistic
- 
- -PVAL: the pvalues of the test statistic
+\itemize{
+  \item \code{mycor}: Correlation value between the deltaPSI and the DifProtDomain matrix (see more details in vignette).
+  \item \code{STATISTIC}: The values of the test statistic
+  \item \code{PVAL}: The pvalues of the test statistic.
 }
-\description{
-Analyze whether the presence of a protein domain increases or decreases in the condition under study.
 }
 \examples{
 \dontrun{

@@ -3,17 +3,15 @@
 \name{PSIss}
 \alias{PSIss}
 \title{relationship between isoforms and events}
-\format{
-A \code{} object \code{PSIss[[1]]} displays the values of PSI
-and \code{PSIss[[2]]} the valeus of expression.
+\description{
+Relationship between isoforms and events.
 }
 \usage{
 data(PSIss)
 }
-\value{
-PSIss object the values of PSI calculated by the funcion
-GetPSI_FromTranRef and also the values of expression.
+\format{
+A \code{} object \code{PSIss[[1]]} displays the values of PSI and \code{PSIss[[2]]} the valeus of expression.
 }
-\description{
-relationship between isoforms and events
+\value{
+PSIss object the values of PSI calculated by the funcion \code{GetPSI_FromTranRef} and also the values of expression.
 }

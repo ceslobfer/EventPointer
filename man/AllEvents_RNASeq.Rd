@@ -3,12 +3,15 @@
 \name{AllEvents_RNASeq}
 \alias{AllEvents_RNASeq}
 \title{Alternative splicing events detected by EventPointer}
-\format{
-A \code{list} object \code{AllEvents_RNASeq[[i]][[j]]}
-displays the jth splicing event for the ith gene.
+\description{
+Alternative splicing events detected by EventPointer.
 }
 \usage{
 data(AllEvents_RNASeq)
+}
+\format{
+A \code{list} object \code{AllEvents_RNASeq[[i]][[j]]}
+displays the jth splicing event for the ith gene.
 }
 \value{
 AllEvents_RNASeq object contains all the detected
@@ -16,7 +19,4 @@ alternativesplicing events using EventPointermethodology.
 The splicing events where detected using the BAM files from
 the dataset published in Seshagiri et al. 2012 andused in
 the \code{SGSeq} R package vignette.
-}
-\description{
-Alternative splicing events detected by EventPointer
 }

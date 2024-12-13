@@ -3,6 +3,9 @@
 \name{PSI_Statistic}
 \alias{PSI_Statistic}
 \title{PSI_Statistic}
+\description{
+Statistical analysis of the alternative splicing events. This function takes as input the values of PSI. Perform a statistical analysis based on permutation test
+}
 \usage{
 PSI_Statistic(PSI, Design, Contrast, nboot)
 }
@@ -16,12 +19,7 @@ PSI_Statistic(PSI, Design, Contrast, nboot)
 \item{nboot}{The number of random analysis.}
 }
 \value{
-The output of these functions is a list containing: two data.frame (deltaPSI and Pvalues) with the values of the deltaPSI
- and the p.values for each contrast, and a third element (LocalFDR) with the information of the local false discovery rate.
-}
-\description{
-Statistical analysis of the alternative splicing events. This function takes as input the values of PSI.
-Perform a statistical analysis based on permutation test
+The output of these functions is a list containing: two data.frame (deltaPSI and Pvalues) with the values of the deltaPSI and the p-values for each contrast, and a third element (LocalFDR) with the information of the local false discovery rate.
 }
 \examples{
 \dontrun{
