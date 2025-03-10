@@ -22,8 +22,11 @@ EventPointerStats_BAM <- function(PSI_boots,
   result <- checkContrastDesignMatrices(Contrast, Design)
   if (result == TRUE){
     UseBootstrap <- T
-    resBootstrap <- EventPointer_Bootstraps(PSI_boots, Design, Contrast, cores, ram, nbootstraps,
-                                            UseBootstrap, Threshold)
+    resBootstrap <- EventPointer_Bootstraps(PSI=PSI_boots, Design=Design,
+                                            Contrast=Contrast,nBootstraps=nbootstraps,
+                                            UsePseudoAligBootstrap =T,
+                                            Threshold =Threshold,
+                                            cores=cores, ram=ram)
     pathResultBootstrap <- paste0(pathResult, "bootstrapResult/")
     dir.create(pathResultBootstrap)
     for (coef in c(1:dim(resBootstrap$Pvalues)[2])){
